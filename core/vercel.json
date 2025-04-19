@@ -1,29 +1,28 @@
-
-  
-  {
-    "version": 2,
-    "builds": [
-      {
-        "src": "vercel_build.py",
-        "use": "@vercel/python",
-        "config": {
-          "maxLambdaSize": "15mb",
-          "runtime": "python3.9"
-        }
-      },
-      {
-        "src": "staticfiles/*",
-        "use": "@vercel/static"
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "vercel_build.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "15mb",
+        "runtime": "python3.9",
+        "includeFiles": ["core/**", "staticfiles/**", "requirements.txt"]
       }
-    ],
-    "routes": [
-      {
-        "src": "/static/(.*)",
-        "dest": "/staticfiles/$1"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "vercel_build.py"
-      }
-    ]
-  }
+    },
+    {
+      "src": "staticfiles/**",
+      "use": "@vercel/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/static/(.*)",
+      "dest": "/staticfiles/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "vercel_build.py"
+    }
+  ]
+}
