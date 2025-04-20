@@ -497,9 +497,10 @@ const emojiData = {
       `https://openmoji.org/data/color/svg/${code}.svg`
     )
   };
-//   function getStickerUrl(code) {
-//     return `https://openmoji.org/data/color/svg/${code}.svg`;
-//   }
+  
+  function getStickerUrl(code) {
+    return `https://openmoji.org/data/color/svg/${code}.svg`;
+  }
   
   // Initialize picker
   function initPicker() {
@@ -543,7 +544,7 @@ const emojiData = {
     Object.keys(emojiData).forEach(category => {
       const btn = document.createElement('button');
       btn.textContent = category;
-      btn.className = 'px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full';
+      btn.className = 'px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full whitespace-nowrap';
       btn.onclick = () => renderEmojis(category);
       container.appendChild(btn);
     });
@@ -556,13 +557,13 @@ const emojiData = {
     Object.keys(stickerData).forEach(category => {
       const btn = document.createElement('button');
       btn.textContent = category;
-      btn.className = 'px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full';
+      btn.className = 'px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full whitespace-nowrap';
       btn.onclick = () => renderStickers(category);
       container.appendChild(btn);
     });
   }
   
-  function renderEmojis(category = 'Smileys') {
+  function renderEmojis(category = 'Smileys & Emotion') {
     const container = document.getElementById('picker-content');
     container.innerHTML = '';
     
@@ -582,8 +583,7 @@ const emojiData = {
     const container = document.getElementById('picker-content');
     container.innerHTML = '';
     
-    stickerData[category].forEach(code => {
-      const url = getStickerUrl(code);
+    stickerData[category].forEach(url => {
       const btn = document.createElement('button');
       btn.className = 'p-1 hover:bg-gray-100 rounded-lg';
       
@@ -633,9 +633,8 @@ const emojiData = {
       return;
     }
     
-    Object.values(stickerData).flat().forEach(code => {
-      if (code.toLowerCase().includes(query)) {
-        const url = getStickerUrl(code);
+    Object.values(stickerData).flat().forEach(url => {
+      if (url.toLowerCase().includes(query)) {
         const btn = document.createElement('button');
         btn.className = 'p-1 hover:bg-gray-100 rounded-lg';
         
