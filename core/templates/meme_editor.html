@@ -130,14 +130,41 @@
                                 <span class="material-symbols-outlined mr-1">download</span> Download
                             </button>
                         </div>
+
+
                         <div class="grid grid-cols-2 gap-3 mb-5">
-                            <button onclick="addSticker('😀')" class="py-2 px-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg transition-colors transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center">
-                                😀 Add Sticker
+                            <button onclick="openPicker('emoji')" class="picker-btn">
+                              <span class="text-xl mr-1">😀</span> Add Emoji
                             </button>
-                            <button onclick="addSticker('⭐')" class="py-2 px-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg transition-colors transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center">
-                                ⭐ Add Sticker
+                            <button onclick="openPicker('sticker')" class="picker-btn">
+                              <span class="text-xl mr-1">🖼️</span> Add Sticker
                             </button>
-                        </div>
+                          </div>
+                          
+                          <!-- Picker Modal -->
+                          <div id="picker-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+                            <div class="bg-white rounded-lg w-full max-w-md max-h-[80vh] flex flex-col shadow-xl">
+                              <div class="flex justify-between items-center p-4 border-b">
+                                <h3 id="picker-title" class="font-semibold text-lg">Select Emoji</h3>
+                                <button onclick="closePicker()" class="text-gray-500 hover:text-gray-700 text-xl">✕</button>
+                              </div>
+                              
+                              <div class="p-4 border-b">
+                                <input type="text" id="picker-search" placeholder="Search..." 
+                                       class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-200 focus:border-indigo-300">
+                              </div>
+                              
+                              <div id="picker-categories" class="flex flex-wrap gap-1 p-2 border-b overflow-x-auto"></div>
+                              
+                              <!-- Scrollable content area -->
+                              <div class="overflow-y-auto">
+                                <div id="picker-content" class="grid grid-cols-8 gap-2 p-4"></div>
+                              </div>
+                            </div>
+                          </div>
+
+
+
                         <div class="grid grid-cols-2 gap-3 mb-5">
                             <button onclick="undoAction()" class="py-2 px-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg transition-colors transform hover:scale-[1.02] active:scale-[0.98] flex items-center justify-center">
                                 <span class="material-symbols-outlined mr-1">undo</span> Undo
