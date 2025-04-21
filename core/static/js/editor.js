@@ -1,4 +1,43 @@
-// Meme Generator with Fabric.js - Responsive Implementation
+// Initialize theme (dark by default)
+document.addEventListener('DOMContentLoaded', function() {
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    updateThemeIcon(savedTheme);
+});
+
+function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', newTheme);
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    if (theme === 'dark') {
+        icon.textContent = 'dark_mode';
+    } else {
+        icon.textContent = 'light_mode';
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 let canvas;
 let templates = [];
 let history = [];
@@ -19,6 +58,30 @@ let defaultTemplates = [
 document.addEventListener('DOMContentLoaded', () => {
     initCanvas();
     fetchMeme();
+
+    document.getElementById('top-text').addEventListener('input', function () {
+        const obj = canvas.getActiveObject();
+        if (obj && obj.type === 'textbox') {
+          obj.text = this.value;
+          canvas.renderAll();
+        }
+      });
+      
+      document.getElementById('text-color').addEventListener('input', function () {
+        const obj = canvas.getActiveObject();
+        if (obj && obj.type === 'textbox') {
+          obj.set('fill', this.value);
+          canvas.renderAll();
+        }
+      });
+      
+      document.getElementById('text-size').addEventListener('input', function () {
+        const obj = canvas.getActiveObject();
+        if (obj && obj.type === 'textbox') {
+          obj.set('fontSize', parseInt(this.value));
+          canvas.renderAll();
+        }
+      });
 });
 
 function initCanvas() {
@@ -50,21 +113,17 @@ function handleResize() {
     const canvasEl = document.getElementById('meme-canvas');
     const container = canvasEl.parentElement;
     
-    // Save current objects
     const objects = canvas.getObjects();
     const activeObject = canvas.getActiveObject();
     
-    // Update canvas dimensions
     canvas.setDimensions({
         width: container.clientWidth,
         height: container.clientHeight
     });
     
-    // Calculate scale factors
     const scaleX = canvas.width / canvas.prevWidth;
     const scaleY = canvas.height / canvas.prevHeight;
     
-    // Scale all objects proportionally
     objects.forEach(obj => {
         obj.scaleX *= scaleX;
         obj.scaleY *= scaleY;
@@ -73,12 +132,10 @@ function handleResize() {
         obj.setCoords();
     });
     
-    // Restore active object
     if (activeObject) {
         canvas.setActiveObject(activeObject);
     }
     
-    // Update previous dimensions
     canvas.prevWidth = canvas.width;
     canvas.prevHeight = canvas.height;
     
@@ -127,7 +184,7 @@ function renderTemplates(templates) {
         const imgElement = document.createElement('img');
         imgElement.src = meme.url;
         imgElement.alt = meme.name || 'Meme template';
-        imgElement.classList.add('w-full', 'h-24', 'object-cover', 'cursor-pointer', 'rounded-lg', 'hover:ring-2', 'hover:ring-indigo-500');
+        imgElement.classList.add('w-96', 'h-12', 'object-cover', 'cursor-pointer', 'rounded-lg', 'hover:ring-2', 'hover:ring-indigo-500');
         imgElement.onclick = () => loadMeme(meme.url);
         gallery.appendChild(imgElement);
     });
@@ -212,56 +269,10 @@ async function addTextToMeme() {
     }
 }
   
-  // Error display function
   
 
 
 
-
-
-// //  
-// function addTextToMeme() {
-//     const form = document.getElementById('meme-form');
-//     const topTextInput = document.getElementById('top-text');
-//     const bottomTextInput = document.getElementById('bottom-text');
-//     const color = document.getElementById('text-color').value;
-//     const size = parseInt(document.getElementById('text-size').value);
-    
-//     let textAdded = false;
-
-//     // Add top text if it exists
-//     if (topTextInput.value.trim()) {
-//         addTextElement(topTextInput.value.trim(), {
-//             top: size * 0.5,
-//             fill: color,
-//             fontSize: size,
-//             originY: 'top'
-//         });
-//         textAdded = true;
-//     }
-
-//     // Add bottom text if it exists
-//     if (bottomTextInput.value.trim()) {
-//         addTextElement(bottomTextInput.value.trim(), {
-//             top: canvas.height - size * 1.5,
-//             fill: color,
-//             fontSize: size,
-//             originY: 'bottom'
-//         });
-//         textAdded = true;
-//     }
-
-//     // Reset the form (clears all inputs)
-//     if (textAdded) {
-//         form.reset();
-        
-//         // Manually reset color picker and slider to defaults if needed
-//         document.getElementById('text-color').value = '#ffffff';
-//         document.getElementById('text-size').value = '30';
-//     } else {
-//         alert('Please enter some text in either field');
-//     }
-// }
 
 function addTextElement(text, options) {
     const textObj = new fabric.Text(text, {
@@ -271,8 +282,8 @@ function addTextElement(text, options) {
         fontSize: options.fontSize,
         fontFamily: 'Impact, sans-serif',
         fontWeight: 'bold',
-        stroke: '#000000',
-        strokeWidth: 2,
+        // stroke: '#000000',
+        // strokeWidth: 2,
         originX: 'center',
         originY: options.originY,
         textAlign: 'center',

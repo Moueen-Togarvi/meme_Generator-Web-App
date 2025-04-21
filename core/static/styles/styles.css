@@ -1,0 +1,121 @@
+
+    :root {
+        /* Light mode colors */
+        --color-primary-light: #4f46e5;  /* indigo-600 */
+        --color-secondary-light: #7c3aed; /* indigo-500 */
+        --color-accent-light: #a78bfa;   /* indigo-300 */
+        
+        /* Dark mode colors */
+        --color-primary-dark: #6366f1;   /* indigo-400 */
+        --color-secondary-dark: #818cf8; /* indigo-300 */
+        --color-accent-dark: #a5b4fc;    /* indigo-200 */
+        
+        /* Text colors */
+        --text-light: #111827;          /* gray-900 */
+        --text-dark: #f3f4f6;           /* gray-100 */
+        
+        /* Background colors */
+        --bg-light: #ffffff;
+        --bg-dark: #111827;              /* gray-900 */
+        
+        /* Card/surface colors */
+        --surface-light: #f9fafb;        /* gray-50 */
+        --surface-dark: #1f2937;        /* gray-800 */
+    }
+    
+    [data-theme="light"] {
+        --color-primary: var(--color-primary-light);
+        --color-secondary: var(--color-secondary-light);
+        --color-accent: var(--color-accent-light);
+        --text-color: var(--text-light);
+        --bg-color: var(--bg-light);
+        --surface-color: var(--surface-light);
+    }
+    
+    [data-theme="dark"] {
+        --color-primary: var(--color-primary-dark);
+        --color-secondary: var(--color-secondary-dark);
+        --color-accent: var(--color-accent-dark);
+        --text-color: var(--text-dark);
+        --bg-color: var(--bg-dark);
+        --surface-color: var(--surface-dark);
+    }
+    
+    /* Apply the colors throughout your template */
+    body {
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        transition: background-color 0.3s, color 0.3s;
+    }
+    
+    .bg-indigo-600 {
+        background-color: var(--color-primary);
+    }
+    
+    .hover\:bg-indigo-700:hover {
+        background-color: var(--color-secondary);
+    }
+    
+    .text-indigo-600 {
+        color: var(--color-primary);
+    }
+    
+    .hover\:text-indigo-800:hover {
+        color: var(--color-secondary);
+    }
+    
+    .bg-indigo-50 {
+        background-color: var(--surface-color);
+    }
+    
+    .hover\:bg-indigo-100:hover {
+        background-color: var(--color-accent);
+    }
+    
+    .bg-gray-100 {
+        background-color: var(--surface-color);
+    }
+    
+    .bg-white {
+        background-color: var(--bg-color);
+    }
+    
+    .bg-gray-800 {
+        background-color: var(--surface-color);
+    }
+    
+    .text-gray-700 {
+        color: var(--text-color);
+    }
+    
+    .border-gray-200 {
+        border-color: var(--surface-color);
+    }
+    
+    .bg-gray-50 {
+        background-color: var(--surface-color);
+    }
+    
+    /* Theme toggle button styles */
+    .theme-toggle {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: var(--color-primary);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        z-index: 1000;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        border: none;
+    }
+    
+    .theme-toggle:hover {
+        background-color: var(--color-secondary);
+        transform: scale(1.05);
+    }

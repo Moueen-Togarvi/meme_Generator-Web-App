@@ -18,8 +18,8 @@
                     <a href="#blog" class="nav-link text-white hover:text-indigo-500">Blog</a>
                     <a href="#about" class="nav-link text-white hover:text-indigo-500">About</a>
                     <a href="#contact" class="nav-link text-white hover:text-indigo-500">Contact</a>
-                    <button id="dark-mode-toggle" class="text-white hover:text-indigo-500">
-                        <span class="material-symbols-outlined">dark_mode</span>
+                    <button onclick="toggleTheme()" class="theme-toggle">
+                        <span id="theme-icon" class="material-symbols-outlined">dark_mode</span>
                     </button>
                 </div>
                 <div class="md:hidden">
@@ -36,10 +36,12 @@
                 <a href="#meme-generator" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Meme Generator</a>
                 <a href="#blog" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Blog</a>
                 <a href="#about" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">About</a>
-                <a href="#contact" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Contact</a>
-                <button id="dark-mode-toggle-mobile" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md w-full text-left">
-                    <span class="material-symbols-outlined">dark_mode</span> Dark Mode
-                </button>
+                <a href="#contact" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Contact</a>  <label class="theme-switch">
+                    <button onclick="toggleTheme()" class="theme-toggle">
+                        <span id="theme-icon" class="material-symbols-outlined">dark_mode</span>
+                    </button>
+                  
+                
             </div>
         </div>
     </nav>
