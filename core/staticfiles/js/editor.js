@@ -15,11 +15,15 @@ let defaultTemplates = [
     { url: "https://i.imgflip.com/1o00in.jpg", name: "Gru's Plan" }
 ];
 
+
+
+
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     initCanvas();
     fetchMeme();
 });
+
 
 function initCanvas() {
     const canvasEl = document.getElementById('meme-canvas');
