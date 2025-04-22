@@ -1,32 +1,18 @@
-// Initialize theme (dark by default)
-document.addEventListener('DOMContentLoaded', function() {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    updateThemeIcon(savedTheme);
-});
-
 function toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', newTheme);
+    const htmlElement = document.documentElement;
+    const isLight = htmlElement.classList.contains('light-mode');
+    const newTheme = isLight ? 'dark' : 'light';
+
+    htmlElement.classList.toggle('light-mode', newTheme === 'light');
     localStorage.setItem('theme', newTheme);
     updateThemeIcon(newTheme);
 }
 
 function updateThemeIcon(theme) {
     const icon = document.getElementById('theme-icon');
-    if (theme === 'dark') {
-        icon.textContent = 'dark_mode';
-    } else {
-        icon.textContent = 'light_mode';
-    }
+    if (!icon) return;
+    icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
 }
-
-
-
-
-
-
 
 
 
@@ -59,29 +45,19 @@ document.addEventListener('DOMContentLoaded', () => {
     initCanvas();
     fetchMeme();
 
-    document.getElementById('top-text').addEventListener('input', function () {
-        const obj = canvas.getActiveObject();
-        if (obj && obj.type === 'textbox') {
-          obj.text = this.value;
-          canvas.renderAll();
+    document.addEventListener('DOMContentLoaded', function () {
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+    
+        if (savedTheme === 'light') {
+            htmlElement.classList.add('light-mode');
+        } else {
+            htmlElement.classList.remove('light-mode');
         }
-      });
-      
-      document.getElementById('text-color').addEventListener('input', function () {
-        const obj = canvas.getActiveObject();
-        if (obj && obj.type === 'textbox') {
-          obj.set('fill', this.value);
-          canvas.renderAll();
-        }
-      });
-      
-      document.getElementById('text-size').addEventListener('input', function () {
-        const obj = canvas.getActiveObject();
-        if (obj && obj.type === 'textbox') {
-          obj.set('fontSize', parseInt(this.value));
-          canvas.renderAll();
-        }
-      });
+    
+        updateThemeIcon(savedTheme);
+    });
+
 });
 
 function initCanvas() {

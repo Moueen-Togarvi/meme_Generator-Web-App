@@ -4,6 +4,36 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    const htmlElement = document.documentElement;
+    const savedTheme = localStorage.getItem('theme') || 'dark';
+
+    if (savedTheme === 'light') {
+        htmlElement.classList.add('light-mode');
+    } else {
+        htmlElement.classList.remove('light-mode');
+    }
+
+    updateThemeIcon(savedTheme);
+});
+
+function toggleTheme() {
+    const htmlElement = document.documentElement;
+    const isLight = htmlElement.classList.contains('light-mode');
+    const newTheme = isLight ? 'dark' : 'light';
+
+    htmlElement.classList.toggle('light-mode', newTheme === 'light');
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    if (!icon) return;
+    icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+}
+    </script>
 </head>
 <body>
     <nav class="w-full bg-gray-800 shadow-lg fixed top-0 z-50 fade-in">
@@ -19,7 +49,7 @@
                     <a href="#about" class="nav-link text-white hover:text-indigo-500">About</a>
                     <a href="#contact" class="nav-link text-white hover:text-indigo-500">Contact</a>
                     <button onclick="toggleTheme()" class="theme-toggle">
-                        <span id="theme-icon" class="material-symbols-outlined">dark_mode</span>
+                        <span id="theme-icon" class="material-symbols-outlined">light_mode</span>
                     </button>
                 </div>
                 <div class="md:hidden">
@@ -38,13 +68,15 @@
                 <a href="#about" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">About</a>
                 <a href="#contact" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Contact</a>  <label class="theme-switch">
                     <button onclick="toggleTheme()" class="theme-toggle">
-                        <span id="theme-icon" class="material-symbols-outlined">dark_mode</span>
+                        <span id="theme-icon" class="material-symbols-outlined">light_mode</span>
                     </button>
                   
                 
             </div>
         </div>
     </nav>
+
+
 
 </body>
 </html>
