@@ -160,7 +160,7 @@ function renderTemplates(templates) {
         const imgElement = document.createElement('img');
         imgElement.src = meme.url;
         imgElement.alt = meme.name || 'Meme template';
-        imgElement.classList.add('w-96', 'h-12', 'object-cover', 'cursor-pointer', 'rounded-lg', 'hover:ring-2', 'hover:ring-indigo-500');
+        imgElement.classList.add('w-96', 'h-40', 'object-cover', 'cursor-pointer', 'rounded-lg', 'hover:ring-2', 'hover:ring-indigo-500');
         imgElement.onclick = () => loadMeme(meme.url);
         gallery.appendChild(imgElement);
     });
