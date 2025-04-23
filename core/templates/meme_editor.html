@@ -5,14 +5,17 @@
 
     <!-- Hero Section -->
     <section id="home" class="w-full h-screen flex items-center justify-center mt-16">
+
+    
         <div class="text-center">
             <h1 class="text-5xl font-bold mb-4 hero-animation">Welcome to MemeGen</h1>
             <p class="text-xl text-gray-700 mb-8">Create hilarious memes in seconds!</p>
             <a href="#meme-generator" class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700">Get Started</a>
         </div>
+
     </section>
 
-
+<hr class="my-8 border-gray-300" />
 
     <!-- Meme Generator Section -->
     <section id="meme-generator" class="w-full py-16 bg-gray-100">
@@ -32,7 +35,7 @@
 
                         <!-- Canvas Container -->
 
-                        <div class="relative h-[400px] md:h-[650px] bg-gray-200 rounded-lg overflow-hidden flex justify-center items-center">
+                        <div class="relative h-[400px] md:h-[450px] bg-gray-200 rounded-lg overflow-hidden flex justify-center items-center">
                             <!-- Responsive Canvas -->
 
 
@@ -88,7 +91,7 @@
                                     <span class="material-symbols-outlined text-gray-500 mr-2">format_align_center</span>
                                     <p class="text-sm text-gray-600">Bottom Text</p>
                                 </div>
-                                <input type="text" id="bottom-text" placeholder="Enter bottom text" class="w-full px-3 py-2 outline-none text-black border-gray-300 dark:border-gray-600  dark:bg-gray-800 dark:text-white" />
+                                <input type="text" id="bottom-text" placeholder="Enter bottom text" class="w-full px-3 py-2 outline-none text-black border-gray-300 dark:border-gray-600   dark:text-white" />
                             </div>
                         </div>
  
@@ -191,7 +194,7 @@
 
 
     <!-- Blog Section -->
-    <section id="blog" class="w-full py-16 bg-white">
+    <section id="blog" class="w-full  py-16 bg-white">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <h2 class="text-3xl font-bold text-center mb-8">Blog</h2>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -212,35 +215,14 @@
     </section>
 
     <!-- About Section -->
-    <section id="about" class="w-full py-16 bg-gray-100">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-center mb-8">About Us</h2>
-            <p class="text-center text-gray-700 max-w-2xl mx-auto">
-                MemeGen is a fun and easy-to-use meme generator that allows you to create and share memes in seconds. Whether you're looking to make your friends laugh or go viral, MemeGen has you covered!
-            </p>
-        </div>
+    <section id="features" class="w-full  py-16 bg-gray-100">
+        {% include "about.html" %}
+
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="w-full py-16 bg-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 class="text-3xl font-bold text-center mb-8">Contact Us</h2>
-            <form class="max-w-2xl mx-auto">
-                <div class="mb-4">
-                    <label for="name" class="block text-gray-700 mb-2">Name</label>
-                    <input type="text" id="name" class="w-full p-2 rounded-lg border border-gray-200" placeholder="Your Name">
-                </div>
-                <div class="mb-4">
-                    <label for="email" class="block text-gray-700 mb-2">Email</label>
-                    <input type="email" id="email" class="w-full p-2 rounded-lg border border-gray-200" placeholder="Your Email">
-                </div>
-                <div class="mb-4">
-                    <label for="message" class="block text-gray-700 mb-2">Message</label>
-                    <textarea id="message" class="w-full p-2 rounded-lg border border-gray-200" rows="5" placeholder="Your Message"></textarea>
-                </div>
-                <button type="submit" class="w-full py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">Send Message</button>
-            </form>
-        </div>
+    <section id="contact" class="w-full h-screen  bg-white">
+        
     </section>
 
     <!-- Footer -->

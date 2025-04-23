@@ -1,0 +1,116 @@
+<!-- Tailwind CDN -->
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@^3/dist/tailwind.min.css" rel="stylesheet"/>
+
+<section id="features" class="py-12">
+  <div class="mx-auto max-w-6xl">
+    <div class="grid gap-10 lg:grid-cols-2 items-center">
+      <div id="timeline" class="hidden lg:flex flex-col"></div>
+      <div id="mediaBox" class="h-[350px] w-full"></div>
+      <div class="lg:hidden w-full">
+        <ul id="carousel" class="flex overflow-x-auto snap-x snap-mandatory space-x-8 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"></ul>
+        <div id="progressBars" class="relative mt-4 h-0.5"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script type="module">
+// fetch raw SVGs once and cache
+async function getSvg(name){
+  const cache = getSvg.cache || (getSvg.cache = {});
+  if (cache[name]) return cache[name];
+  const url = `https://unpkg.com/lucide-static@latest/icons/${name.toLowerCase()}.svg`;
+  const txt = await fetch(url).then(r => r.text());
+  return (cache[name] = txt.replace('<svg', '<svg class="w-6 h-6 stroke-indigo-600"'));
+}
+
+const data = [
+  {id:1,title:"1. Select a Meme Template",content:"Browse Eldora UI's gallery or upload your own image. The editor loads the template onto the Fabric.js canvas, ready for customization.",image:"https://i.pinimg.com/736x/ca/aa/49/caaa49d386d84f2d037d0abcc919778f.jpg",icon:"image"},
+  {id:2,title:"2. Add Text & Stickers",content:"Drag headlines, captions, or emojis anywhere. Rich‑text controls (font, size, stroke, shadow) appear inline thanks to Fabric.js textbox extras.",image:"https://i.pinimg.com/736x/a5/dc/0a/a5dc0af50d185b7f9111949b17e17e1a.jpg",icon:"type"},
+  {id:3,title:"3. Edit Like Photoshop—Undo / Redo",content:"Every move is tracked in a history stack so users can experiment fearlessly. Keyboard shortcuts (Ctrl+Z / Y) are wired‑up globally.",image:"https://i.pinimg.com/736x/b1/b9/c2/b1b9c230143fb0d8540eabe5b74adf27.jpg",icon:"history"},
+  {id:4,title:"4. Export & Share Instantly",content:"One click renders the canvas to WebP/PNG and pings your Django backend for social‑media ready links—no bandwidth‑heavy uploads.",image:"https://i.pinimg.com/736x/54/ea/83/54ea83a7d5a1c118ed0c3a2c146161f8.jpg",icon:"share-2"}
+];
+
+const timeline = document.getElementById('timeline');
+const mediaBox = document.getElementById('mediaBox');
+const carousel = document.getElementById('carousel');
+const progressBars = document.getElementById('progressBars');
+let current = 0;
+const delay = 5000;
+
+async function renderTimeline() {
+  const items = await Promise.all(data.map(async d => ({ ...d, svg: await getSvg(d.icon) })));
+
+  // Build timeline items
+  const timelineItems = items.map((item, i) => `
+    <div class="flex items-center mb-8 last:mb-0 relative group z-10">
+      <div class="mx-4 flex-none flex items-center justify-center w-12 h-12 rounded-full bg-indigo-600/10">${item.svg}</div>
+      <div class="space-y-2 max-w-md">
+        <h3 class="text-lg font-bold">${item.title}</h3>
+        <p class="text-sm text-gray-600 dark:text-gray-400">${item.content}</p>
+      </div>
+    </div>
+  `).join('');
+
+  // Wrap with outer timeline + full-length line
+  timeline.innerHTML = `
+    <div class="relative pl-6">
+      <div class="absolute top-0 bottom-0 left-6 w-0.5 bg-neutral-300/50 dark:bg-neutral-300/30"></div>
+      ${timelineItems}
+    </div>
+  `;
+}
+
+function renderCarousel() {
+  carousel.innerHTML = data.map((item, i) => `
+    <li class="snap-center shrink-0 max-w-xs" data-index="${i}">
+      <h2 class="text-xl font-bold">${item.title}</h2>
+      <p class="text-sm text-gray-600">${item.content}</p>
+    </li>
+  `).join('');
+  progressBars.innerHTML = data.map(() => `
+    <div class="absolute inset-x-0 h-0.5 bg-neutral-300/50">
+      <div class="progress h-full w-0 origin-left bg-indigo-600 transition-all"></div>
+    </div>
+  `).join('');
+}
+
+function showMedia(i) {
+  const it = data[i];
+  mediaBox.innerHTML = it.image ?
+    `<img src="${it.image}" class="w-full h-full object-cover rounded-xl border p-1 shadow"/>` :
+    it.video ?
+    `<video src="${it.video}" autoplay loop muted class="w-full h-full object-cover rounded-xl shadow"></video>` :
+    `<div class="w-full h-full bg-gray-200 rounded-xl"></div>`;
+}
+
+function advance() {
+  current = (current + 1) % data.length;
+  updateUI();
+}
+
+function updateUI() {
+  document.querySelectorAll('#timeline .progress, #progressBars .progress').forEach((el, idx) => {
+    el.style.transitionDuration = idx === current ? `${delay}ms` : '0s';
+    el.style.height = idx === current && timeline.offsetParent ? '100%' : '0%';
+    el.style.width = idx === current && !timeline.offsetParent ? '100%' : '0%';
+  });
+  showMedia(current);
+}
+
+renderTimeline().then(() => {
+  renderCarousel();
+  showMedia(0);
+  updateUI();
+});
+
+let timer = setInterval(advance, delay);
+carousel.addEventListener('click', e => {
+  const li = e.target.closest('li[data-index]');
+  if (!li) return;
+  current = +li.dataset.index;
+  clearInterval(timer);
+  timer = setInterval(advance, delay);
+  updateUI();
+});
+</script>

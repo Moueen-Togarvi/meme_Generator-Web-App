@@ -4,36 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-    const htmlElement = document.documentElement;
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-
-    if (savedTheme === 'light') {
-        htmlElement.classList.add('light-mode');
-    } else {
-        htmlElement.classList.remove('light-mode');
-    }
-
-    updateThemeIcon(savedTheme);
-});
-
-function toggleTheme() {
-    const htmlElement = document.documentElement;
-    const isLight = htmlElement.classList.contains('light-mode');
-    const newTheme = isLight ? 'dark' : 'light';
-
-    htmlElement.classList.toggle('light-mode', newTheme === 'light');
-    localStorage.setItem('theme', newTheme);
-    updateThemeIcon(newTheme);
-}
-
-function updateThemeIcon(theme) {
-    const icon = document.getElementById('theme-icon');
-    if (!icon) return;
-    icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
-}
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CSS CDN -->
 </head>
 <body>
     <nav class="w-full bg-gray-800 shadow-lg fixed top-0 z-50 fade-in">
@@ -53,7 +24,7 @@ function updateThemeIcon(theme) {
                     </button>
                 </div>
                 <div class="md:hidden">
-                    <button id="mobile-menu-button" class="text-white focus:outline-none">
+                    <button id="mobile-menu-button" class="text-white focus:outline-none" onclick="toggleMobileMenu()">
                         <span class="material-symbols-outlined">menu</span>
                     </button>
                 </div>
@@ -66,17 +37,48 @@ function updateThemeIcon(theme) {
                 <a href="#meme-generator" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Meme Generator</a>
                 <a href="#blog" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Blog</a>
                 <a href="#about" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">About</a>
-                <a href="#contact" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Contact</a>  <label class="theme-switch">
-                    <button onclick="toggleTheme()" class="theme-toggle">
-                        <span id="theme-icon" class="material-symbols-outlined">light_mode</span>
-                    </button>
-                  
-                
+                <a href="#contact" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Contact</a>
+                <button onclick="toggleTheme()" class="theme-toggle">
+                    <span id="theme-icon" class="material-symbols-outlined">light_mode</span>
+                </button>
             </div>
         </div>
     </nav>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const htmlElement = document.documentElement;
+            const savedTheme = localStorage.getItem('theme') || 'dark';
 
+            if (savedTheme === 'light') {
+                htmlElement.classList.add('light-mode');
+            } else {
+                htmlElement.classList.remove('light-mode');
+            }
 
+            updateThemeIcon(savedTheme);
+        });
+
+        function toggleTheme() {
+            const htmlElement = document.documentElement;
+            const isLight = htmlElement.classList.contains('light-mode');
+            const newTheme = isLight ? 'dark' : 'light';
+
+            htmlElement.classList.toggle('light-mode', newTheme === 'light');
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon(newTheme);
+        }
+
+        function updateThemeIcon(theme) {
+            const icon = document.getElementById('theme-icon');
+            if (!icon) return;
+            icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+        }
+
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenu.classList.toggle('hidden');
+        }
+    </script>
 </body>
 </html>
