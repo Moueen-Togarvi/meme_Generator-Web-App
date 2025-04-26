@@ -9,21 +9,5 @@
       "src": "*.html",
       "use": "@vercel/static"
     }
-  ],
-  "routes": [
-    {
-      "src": "/api/.*",
-      "dest": "/index.js",
-      "status": 404
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html",
-      "status": 404
-    }
-  ],
-  "errorPages": {
-    "404": "/404.html",
-    "500": "/500.html"
-  }
+  ]
 }

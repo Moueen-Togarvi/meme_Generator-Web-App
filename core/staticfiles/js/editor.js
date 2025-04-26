@@ -1,4 +1,29 @@
-// Meme Generator with Fabric.js - Responsive Implementation
+function toggleTheme() {
+    const htmlElement = document.documentElement;
+    const isLight = htmlElement.classList.contains('light-mode');
+    const newTheme = isLight ? 'dark' : 'light';
+
+    htmlElement.classList.toggle('light-mode', newTheme === 'light');
+    localStorage.setItem('theme', newTheme);
+    updateThemeIcon(newTheme);
+}
+
+function updateThemeIcon(theme) {
+    const icon = document.getElementById('theme-icon');
+    if (!icon) return;
+    icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
+}
+
+
+
+
+
+
+
+
+
+
+
 let canvas;
 let templates = [];
 let history = [];
@@ -15,15 +40,25 @@ let defaultTemplates = [
     { url: "https://i.imgflip.com/1o00in.jpg", name: "Gru's Plan" }
 ];
 
-
-
-
 // Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     initCanvas();
     fetchMeme();
-});
 
+    document.addEventListener('DOMContentLoaded', function () {
+        const htmlElement = document.documentElement;
+        const savedTheme = localStorage.getItem('theme') || 'dark';
+    
+        if (savedTheme === 'light') {
+            htmlElement.classList.add('light-mode');
+        } else {
+            htmlElement.classList.remove('light-mode');
+        }
+    
+        updateThemeIcon(savedTheme);
+    });
+
+});
 
 function initCanvas() {
     const canvasEl = document.getElementById('meme-canvas');
@@ -54,21 +89,17 @@ function handleResize() {
     const canvasEl = document.getElementById('meme-canvas');
     const container = canvasEl.parentElement;
     
-    // Save current objects
     const objects = canvas.getObjects();
     const activeObject = canvas.getActiveObject();
     
-    // Update canvas dimensions
     canvas.setDimensions({
         width: container.clientWidth,
         height: container.clientHeight
     });
     
-    // Calculate scale factors
     const scaleX = canvas.width / canvas.prevWidth;
     const scaleY = canvas.height / canvas.prevHeight;
     
-    // Scale all objects proportionally
     objects.forEach(obj => {
         obj.scaleX *= scaleX;
         obj.scaleY *= scaleY;
@@ -77,12 +108,10 @@ function handleResize() {
         obj.setCoords();
     });
     
-    // Restore active object
     if (activeObject) {
         canvas.setActiveObject(activeObject);
     }
     
-    // Update previous dimensions
     canvas.prevWidth = canvas.width;
     canvas.prevHeight = canvas.height;
     
@@ -94,22 +123,34 @@ function loadRandomTemplate() {
     loadMeme(defaultTemplates[randomIndex].url);
 }
 
-function fetchMeme() {
-    fetch('https://api.imgflip.com/get_memes')
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                templates = data.data.memes;
-            } else {
-                templates = defaultTemplates;
-            }
-            renderTemplates(templates.slice(0, 4));
-        })
-        .catch(() => {
-            templates = defaultTemplates;
-            renderTemplates(templates.slice(0, 4));
-        });
-}
+
+
+async function fetchMeme() {
+    try {
+      const response = await fetch('https://api.imgflip.com/get_memes');
+      
+      if (!response.ok) {
+        throw new Error(`API request failed with status ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      if (!data.success) {
+        throw new Error(data.error_message || 'API returned unsuccessful response');
+      }
+      
+      templates = data.data.memes;
+      renderTemplates(templates.slice(0, 4));
+      
+    } catch (error) {
+      console.error('Error fetching memes:', error);
+      showErrorToUser('Failed to load templates. Using default memes.');
+      templates = defaultTemplates;
+      renderTemplates(templates.slice(0, 4));
+    }
+  }
+
+
 
 function renderTemplates(templates) {
     const gallery = document.getElementById('meme-gallery');
@@ -119,7 +160,7 @@ function renderTemplates(templates) {
         const imgElement = document.createElement('img');
         imgElement.src = meme.url;
         imgElement.alt = meme.name || 'Meme template';
-        imgElement.classList.add('w-full', 'h-24', 'object-cover', 'cursor-pointer', 'rounded-lg', 'hover:ring-2', 'hover:ring-indigo-500');
+        imgElement.classList.add('w-96', 'h-40', 'object-cover', 'cursor-pointer', 'rounded-lg', 'hover:ring-2', 'hover:ring-indigo-500');
         imgElement.onclick = () => loadMeme(meme.url);
         gallery.appendChild(imgElement);
     });
@@ -151,66 +192,60 @@ function loadMeme(url) {
     }, { crossOrigin: 'anonymous' });
 }
 
-function addTextToMeme() {
-    const form = document.getElementById('meme-form');
-    const topTextInput = document.getElementById('top-text');
-    const bottomTextInput = document.getElementById('bottom-text');
-    const color = document.getElementById('text-color').value;
-    const size = parseInt(document.getElementById('text-size').value);
-    
-    let textAdded = false;
 
-    // Add top text if it exists
-    if (topTextInput.value.trim()) {
-        addTextElement(topTextInput.value.trim(), {
-            top: size * 0.5,
-            fill: color,
-            fontSize: size,
-            originY: 'top'
-        });
-        textAdded = true;
-    }
 
-    // Add bottom text if it exists
-    if (bottomTextInput.value.trim()) {
-        addTextElement(bottomTextInput.value.trim(), {
-            top: canvas.height - size * 1.5,
-            fill: color,
-            fontSize: size,
-            originY: 'bottom'
-        });
-        textAdded = true;
-    }
 
-    // Reset the form (clears all inputs)
-    if (textAdded) {
-        form.reset();
-        
-        // Manually reset color picker and slider to defaults if needed
-        document.getElementById('text-color').value = '#ffffff';
-        document.getElementById('text-size').value = '30';
-    } else {
-        const errorDiv = document.getElementById('error-message') || createErrorDisplay();
-        errorDiv.textContent = message;
-        errorDiv.style.display = 'block';
 
-        setTimeout(() => {
-            errorDiv.style.display = 'none';
-         }, 5000);
-        // alert('Please enter some text in either field');
+async function addTextToMeme() {
+    try {
+        const form = document.getElementById('meme-form');
+        const topTextInput = document.getElementById('top-text');
+        const bottomTextInput = document.getElementById('bottom-text');
+        const color = document.getElementById('text-color').value;
+        const size = parseInt(document.getElementById('text-size').value);
+
+        if (!topTextInput) throw new Error('Top text input not found');
+        if (!bottomTextInput) throw new Error('Bottom text input not found');
+
+        let textAdded = false;
+
+        // Add top text if it exists
+        if (topTextInput.value.trim()) {
+            addTextElement(topTextInput.value.trim(), {
+                top: size * 0.5,
+                fill: color,
+                fontSize: size,
+                originY: 'top'
+            });
+            textAdded = true;
+        }
+
+        // Add bottom text if it exists
+        if (bottomTextInput.value.trim()) {
+            addTextElement(bottomTextInput.value.trim(), {
+                top: canvas.height - size * 1.5,
+                fill: color,
+                fontSize: size,
+                originY: 'bottom'
+            });
+            textAdded = true;
+        }
+
+        // Reset the form (clears all inputs)
+        if (textAdded) {
+            form.reset();
+            document.getElementById('text-color').value = '#ffffff';
+            document.getElementById('text-size').value = '30';
+        } else {
+            alert('Please enter some text in either field');
+        }
+    } catch (error) {
+        console.error('Error in addTextToMeme:', error);
+        showErrorToUser(error.message || 'Failed to add text');
     }
 }
-
-
-// function showErrorToUser(message) {
-//     const errorDiv = document.getElementById('error-message') || createErrorDisplay();
-//     errorDiv.textContent = message;
-//     errorDiv.style.display = 'block';
-
-//     setTimeout(() => {
-//         errorDiv.style.display = 'none';
-//     }, 5000);
-// }
+  
+  
 
 
 
@@ -223,8 +258,8 @@ function addTextElement(text, options) {
         fontSize: options.fontSize,
         fontFamily: 'Impact, sans-serif',
         fontWeight: 'bold',
-        stroke: '#000000',
-        strokeWidth: 2,
+        // stroke: '#000000',
+        // strokeWidth: 2,
         originX: 'center',
         originY: options.originY,
         textAlign: 'center',
@@ -272,28 +307,27 @@ function removeText() {
     }
 }
 
-// function addSticker(emoji) {
-//     const sticker = new fabric.Text(emoji, {
-//         left: canvas.width / 2,
-//         top: canvas.height / 2,
-//         fontSize: 50,
-//         fill: '#ffffff',
-//         fontFamily: 'Arial',
-//         stroke: '#000000',
-//         strokeWidth: 1,
-//         originX: 'center',
-//         originY: 'center',
-//         padding: 5,
-//         shadow: 'rgba(0,0,0,0.3) 2px 2px 5px',
-//         name: 'sticker'
-//     });
+function addSticker(emoji) {
+    const sticker = new fabric.Text(emoji, {
+        left: canvas.width / 2,
+        top: canvas.height / 2,
+        fontSize: 50,
+        fill: '#ffffff',
+        fontFamily: 'Arial',
+        stroke: '#000000',
+        strokeWidth: 1,
+        originX: 'center',
+        originY: 'center',
+        padding: 5,
+        shadow: 'rgba(0,0,0,0.3) 2px 2px 5px',
+        name: 'sticker'
+    });
     
-//     canvas.add(sticker);
-//     sticker.bringToFront();
-//     canvas.setActiveObject(sticker);
-//     saveState();
-// }
-
+    canvas.add(sticker);
+    sticker.bringToFront();
+    canvas.setActiveObject(sticker);
+    saveState();
+}
 
 function saveState() {
     // Limit history to 20 states
@@ -473,11 +507,30 @@ function shareOnWhatsApp() {
     window.open(`https://wa.me/?text=${encodeURIComponent(`${text} ${url}`)}`, '_blank');
 }
 
+//  error handling by moeen
+
+function createErrorDisplay() {
+    const div = document.createElement('div');
+    div.id = 'error-message';
+    div.style.position = 'fixed';
+    div.style.bottom = '20px';
+    div.style.right = '20px';
+    div.style.padding = '15px';
+    div.style.backgroundColor = '#ff4444';
+    div.style.color = 'white';
+    div.style.borderRadius = '5px';
+    div.style.zIndex = '1000';
+    div.style.display = 'none';
+    document.body.appendChild(div);
+    return div;
+  }
 
 
 
 
-// Emoji data - using Twemoji CDN (no API key needed)
+
+// emojis 
+
 const emojiData = {
     "Smileys & Emotion": ["😀","😃","😄","😁","😆","😅","😂","🤣","🥲","🥹","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🥸","🤩","🥳","😏","😒","😞","😔","😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬","🤯","😳","🥵","🥶","😱","😨","😰","😥","😓","🫣","🤗","🫡","🤔","🫢","🤭","🤫","🤥","😶","😶‍🌫️","😐","😑","😬","🫠","🙄","😯","😦","😧","😮","😲","🥱","😴","🤤","😪","😵","😵‍💫","🫥","🤐","🥴","🤢","🤮","🤧","😷","🤒","🤕","🤑","🤠","😈","👿","👹","👺","🤡","👻","👽","👾","🤖","😺","😸","😹","😻","😼","😽","🙀","😿","😾"],
     "People & Body": ["👋","🤚","🖐️","✋","🖖","👌","🤌","🤏","✌️","🤞","🫰","🤟","🤘","🤙","🫵","🫱","🫲","🫳","🫴","👈","👉","👆","🖕","👇","☝️","👍","👎","✊","👊","🤛","🤜","👏","🫶","🙌","👐","🤲","🤝","🙏","✍️","💅","🤳","💪","🦾","🦿","🦵","🦶","👂","🦻","👃","🧠","🫀","🫁","🦷","🦴","👀","👁️","👅","👄","🫦","👶","🧒","👦","👧","🧑","👱","👨","🧔","👨‍🦰","👨‍🦱","👨‍🦳","👨‍🦲","👩","👩‍🦰","👩‍🦱","👩‍🦳","👩‍🦲","🧓","👴","👵","🙍","🙍‍♂️","🙍‍♀️","🙎","🙎‍♂️","🙎‍♀️","🙅","🙅‍♂️","🙅‍♀️","🙆","🙆‍♂️","🙆‍♀️","💁","💁‍♂️","💁‍♀️","🙋","🙋‍♂️","🙋‍♀️","🧏","🧏‍♂️","🧏‍♀️","🙇","🙇‍♂️","🙇‍♀️","🤦","🤦‍♂️","🤦‍♀️","🤷","🤷‍♂️","🤷‍♀️","👮","👮‍♂️","👮‍♀️","🕵️","🕵️‍♂️","🕵️‍♀️","💂","💂‍♂️","💂‍♀️","🥷","👷","👷‍♂️","👷‍♀️","🫅","🤴","👸","👳","👳‍♂️","👳‍♀️","👲","🧕","🤵","🤵‍♂️","🤵‍♀️","👰","👰‍♂️","👰‍♀️","🫃","🫄","🤰","🤱","👩‍🍼","👨‍🍼","🧑‍🍼","👼","🎅","🤶","🧑‍🎄","🦸","🦸‍♂️","🦸‍♀️","🦹","🦹‍♂️","🦹‍♀️","🧙","🧙‍♂️","🧙‍♀️","🧚","🧚‍♂️","🧚‍♀️","🧛","🧛‍♂️","🧛‍♀️","🧜","🧜‍♂️","🧜‍♀️","🧝","🧝‍♂️","🧝‍♀️","🧞","🧞‍♂️","🧞‍♀️","🧟","🧟‍♂️","🧟‍♀️","🧌","💆","💆‍♂️","💆‍♀️","💇","💇‍♂️","💇‍♀️","🚶","🚶‍♂️","🚶‍♀️","🧍","🧍‍♂️","🧍‍♀️","🧎","🧎‍♂️","🧎‍♀️","🏃","🏃‍♂️","🏃‍♀️","💃","🕺","🕴️","👯","👯‍♂️","👯‍♀️","🧖","🧖‍♂️","🧖‍♀️","🧗","🧗‍♂️","🧗‍♀️","🤺","🏇","⛷️","🏂","🪂","🏌️","🏌️‍♂️","🏌️‍♀️","🏄","🏄‍♂️","🏄‍♀️","🚣","🚣‍♂️","🚣‍♀️","🏊","🏊‍♂️","🏊‍♀️","⛹️","⛹️‍♂️","⛹️‍♀️","🏋️","🏋️‍♂️","🏋️‍♀️","🚴","🚴‍♂️","🚴‍♀️","🚵","🚵‍♂️","🚵‍♀️","🤸","🤸‍♂️","🤸‍♀️","🤼","🤼‍♂️","🤼‍♀️","🤽","🤽‍♂️","🤽‍♀️","🤾","🤾‍♂️","🤾‍♀️","🤹","🤹‍♂️","🤹‍♀️","🧘","🧘‍♂️","🧘‍♀️","🛀","🛌","🧑‍🤝‍🧑","👭","👫","👬","💏","👩‍❤️‍💋‍👨","👨‍❤️‍💋‍👨","👩‍❤️‍💋‍👩","💑","👩‍❤️‍👨","👨‍❤️‍👨","👩‍❤️‍👩","👪","👨‍👩‍👦","👨‍👩‍👧","👨‍👩‍👧‍👦","👨‍👩‍👦‍👦","👨‍👩‍👧‍👧","👨‍👨‍👦","👨‍👨‍👧","👨‍👨‍👧‍👦","👨‍👨‍👦‍👦","👨‍👨‍👧‍👧","👩‍👩‍👦","👩‍👩‍👧","👩‍👩‍👧‍👦","👩‍👩‍👦‍👦","👩‍👩‍👧‍👧","👨‍👦","👨‍👦‍👦","👨‍👧","👨‍👧‍👦","👨‍👧‍👧","👩‍👦","👩‍👦‍👦","👩‍👧","👩‍👧‍👦","👩‍👧‍👧","🪢","🪮","🧶","🧵","🪡","🧥","🥼","🦺","👚","👕","👖","🩲","🩳","👔","👗","👙","🩱","👘","🥻","🩴","👠","👡","👢","👞","👟","🥾","🥿","🧦","🧤","🧣","🎩","🧢","👒","🎓","⛑️","🪖","👑","💍","👝","👛","👜","💼","🎒","🩴","👓","🕶️","🥽","🦯","🧳","🌂","🪄","💊","🩹","🩺","🧬","🦠","🧴","🧷","🪒","🧹","🧺","🧻","🪣","🧼","🪥","🧽","🧯","🛒","🛁","🪤","🪒","🔪","🏺"],
@@ -501,10 +554,9 @@ const emojiData = {
       `https://openmoji.org/data/color/svg/${code}.svg`
     )
   };
-  
-  function getStickerUrl(code) {
-    return `https://openmoji.org/data/color/svg/${code}.svg`;
-  }
+//   function getStickerUrl(code) {
+//     return `https://openmoji.org/data/color/svg/${code}.svg`;
+//   }
   
   // Initialize picker
   function initPicker() {
@@ -548,7 +600,7 @@ const emojiData = {
     Object.keys(emojiData).forEach(category => {
       const btn = document.createElement('button');
       btn.textContent = category;
-      btn.className = 'px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full whitespace-nowrap';
+      btn.className = 'px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full';
       btn.onclick = () => renderEmojis(category);
       container.appendChild(btn);
     });
@@ -561,13 +613,13 @@ const emojiData = {
     Object.keys(stickerData).forEach(category => {
       const btn = document.createElement('button');
       btn.textContent = category;
-      btn.className = 'px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full whitespace-nowrap';
+      btn.className = 'px-3 py-1 text-xs bg-gray-100 hover:bg-gray-200 rounded-full';
       btn.onclick = () => renderStickers(category);
       container.appendChild(btn);
     });
   }
   
-  function renderEmojis(category = 'Smileys & Emotion') {
+  function renderEmojis(category = 'Smileys') {
     const container = document.getElementById('picker-content');
     container.innerHTML = '';
     
@@ -587,7 +639,8 @@ const emojiData = {
     const container = document.getElementById('picker-content');
     container.innerHTML = '';
     
-    stickerData[category].forEach(url => {
+    stickerData[category].forEach(code => {
+      const url = getStickerUrl(code);
       const btn = document.createElement('button');
       btn.className = 'p-1 hover:bg-gray-100 rounded-lg';
       
@@ -637,8 +690,9 @@ const emojiData = {
       return;
     }
     
-    Object.values(stickerData).flat().forEach(url => {
-      if (url.toLowerCase().includes(query)) {
+    Object.values(stickerData).flat().forEach(code => {
+      if (code.toLowerCase().includes(query)) {
+        const url = getStickerUrl(code);
         const btn = document.createElement('button');
         btn.className = 'p-1 hover:bg-gray-100 rounded-lg';
         
@@ -700,3 +754,5 @@ const emojiData = {
   
   // Initialize when DOM loads
   document.addEventListener('DOMContentLoaded', initPicker);
+
+
