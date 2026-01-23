@@ -1,69 +1,90 @@
-<!-- Main Content Section -->
-
-
-<!-- Canvas for Globe Animation -->
-<canvas id="globeCanvas" class="absolute inset-0 w-full h-full"></canvas>
-
-<script type="module">
-import createGlobe from 'https://cdn.skypack.dev/cobe';
-
-const canvas = document.getElementById('globeCanvas');
-let width = canvas.offsetWidth;
-let phi = 0;
-
-// Resize handler
-const onResize = () => {
-  width = canvas.offsetWidth;
-};
-
-// Render handler
-const onRender = (state) => {
-  phi += 0.005;
-  state.phi = phi;
-  state.width = width * 2;
-  state.height = width * 2;
-};
-
-// Initialize the globe animation
-window.addEventListener('resize', onResize);
-onResize();
-
-const globe = createGlobe(canvas, {
-  devicePixelRatio: 2,
-  width: width,
-  height: width,
-  phi: 0,
-  theta: 0.3,
-  dark: 1,
-  diffuse: 0.4,
-  mapSamples: 16000,
-  mapBrightness: 1.2,
-  baseColor: [0.3, 0.3, 0.3],
-  markerColor: [251 / 255, 100 / 255, 21 / 255],
-  glowColor: [1, 1, 1],
-  markers: [
-    { location: [14.5995, 120.9842], size: 0.03 },
-    { location: [19.076, 72.8777], size: 0.03 },
-    { location: [23.8103, 90.4125], size: 0.05 },
-    { location: [30.0444, 31.2357], size: 0.07 },
-    { location: [39.9042, 116.4074], size: 0.08 },
-    { location: [-23.5505, -46.6333], size: 0.05 },
-    { location: [19.4326, -99.1332], size: 0.04 },
-    { location: [40.7128, -74.006], size: 0.1 },
-    { location: [34.6937, 135.5022], size: 0.05 },
-    { location: [41.0082, 28.9784], size: 0.06 },
-  ],
-  onRender: onRender,
-});
-
-// Clean up event listener when window is unloaded
-window.addEventListener('beforeunload', () => {
-  window.removeEventListener('resize', onResize);
-});
-</script>
+<!-- Lightweight Background Animation -->
+<div class="animated-bg">
+  <div class="floating-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+    <div class="shape shape-4"></div>
+    <div class="shape shape-5"></div>
+  </div>
+</div>
 
 <style>
-/* Adding a simple fade-in animation for the hero text */
+/* Lightweight floating animation */
+.animated-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.floating-shapes {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.shape {
+  position: absolute;
+  border-radius: 50%;
+  background: linear-gradient(45deg, rgba(99, 102, 241, 0.1), rgba(129, 140, 248, 0.1));
+  animation: float 6s ease-in-out infinite;
+}
+
+.shape-1 {
+  width: 80px;
+  height: 80px;
+  top: 20%;
+  left: 10%;
+  animation-delay: 0s;
+}
+
+.shape-2 {
+  width: 120px;
+  height: 120px;
+  top: 60%;
+  right: 15%;
+  animation-delay: 2s;
+}
+
+.shape-3 {
+  width: 60px;
+  height: 60px;
+  top: 80%;
+  left: 20%;
+  animation-delay: 4s;
+}
+
+.shape-4 {
+  width: 100px;
+  height: 100px;
+  top: 30%;
+  right: 30%;
+  animation-delay: 1s;
+}
+
+.shape-5 {
+  width: 70px;
+  height: 70px;
+  top: 70%;
+  left: 60%;
+  animation-delay: 3s;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translateY(-20px) rotate(180deg);
+    opacity: 1;
+  }
+}
+
+/* Hero animation */
 @keyframes fadeIn {
   0% {
     opacity: 0;
@@ -79,22 +100,14 @@ window.addEventListener('beforeunload', () => {
   animation: fadeIn 1s ease-out;
 }
 
-/* Additional styles for the canvas and the section */
+/* Section positioning */
 #home {
   position: relative;
   overflow: hidden;
 }
 
-#globeCanvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-}
-
-/* Optional: Adjust the content's z-index and positioning to make sure it's on top */
 .text-center {
   position: relative;
-  z-index: 10; /* Ensure the content stays on top */
+  z-index: 10;
 }
 </style>

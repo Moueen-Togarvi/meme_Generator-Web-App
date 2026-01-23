@@ -7,40 +7,60 @@
     <script src="https://cdn.tailwindcss.com"></script> <!-- Tailwind CSS CDN -->
 </head>
 <body>
-    <nav class="w-full bg-gray-800 shadow-lg fixed top-0 z-50 fade-in">
+    <nav class="w-full fixed top-0 z-50 fade-in">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center h-16">
-                <div class="flex items-center">
-                    <a href="#" class="text-2xl font-bold text-white">MemeGen</a>
+            <div class="flex justify-center items-center h-16">
+                <!-- Glassmorphism Navbar -->
+                <div class="backdrop-blur-md bg-card/80 border border-primary/20 rounded-2xl px-8 py-3 shadow-xl">
+                    <div class="flex items-center space-x-8">
+                        <!-- Logo/Brand -->
+                        <div class="flex items-center space-x-2 mr-8">
+                            <span class="text-2xl font-bold bg-gradient-to-r from-yellow-400 to-orange-500 bg-clip-text text-transparent">
+                                Meme Gen
+                            </span>
+                        </div>
+                        
+                        <a href="#home" class="nav-link text-primary hover:text-secondary transition-all duration-300 font-medium relative group">
+                            Home
+                            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a>
+                        <a href="#meme-generator" class="nav-link text-primary hover:text-secondary transition-all duration-300 font-medium relative group">
+                            Generator
+                            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a>
+                        <a href="#how-to" class="nav-link text-primary hover:text-secondary transition-all duration-300 font-medium relative group">
+                            How To
+                            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a>
+                        <a href="#blog" class="nav-link text-primary hover:text-secondary transition-all duration-300 font-medium relative group">
+                            Blog
+                            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a>
+                        <a href="#features" class="nav-link text-primary hover:text-secondary transition-all duration-300 font-medium relative group">
+                            Features
+                            <span class="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all duration-300 group-hover:w-full"></span>
+                        </a>
+                    </div>
                 </div>
-                <div class="hidden md:flex items-center space-x-10">
-                    <a href="#home" class="nav-link text-white hover:text-indigo-500">Home</a>
-                    <a href="#meme-generator" class="nav-link text-white hover:text-indigo-500">Meme Generator</a>
-                    <a href="#blog" class="nav-link text-white hover:text-indigo-500">Blog</a>
-                    <a href="#about" class="nav-link text-white hover:text-indigo-500">About</a>
-                    <a href="#contact" class="nav-link text-white hover:text-indigo-500">Contact</a>
-                    <button onclick="toggleTheme()" class="theme-toggle">
-                        <span id="theme-icon" class="material-symbols-outlined">light_mode</span>
-                    </button>
-                </div>
-                <div class="md:hidden">
-                    <button id="mobile-menu-button" class="text-white focus:outline-none" onclick="toggleMobileMenu()">
+                
+                <!-- Mobile Menu Button -->
+                <div class="md:hidden ml-4">
+                    <button id="mobile-menu-button" class="text-primary focus:outline-none backdrop-blur-md bg-card/80 border border-primary/20 rounded-lg p-2" onclick="toggleMobileMenu()">
                         <span class="material-symbols-outlined">menu</span>
                     </button>
                 </div>
             </div>
         </div>
         <!-- Mobile Menu -->
-        <div id="mobile-menu" class="md:hidden hidden bg-gray-800">
-            <div class="px-2 pt-2 pb-3 space-y-1">
-                <a href="#home" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Home</a>
-                <a href="#meme-generator" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Meme Generator</a>
-                <a href="#blog" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Blog</a>
-                <a href="#about" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">About</a>
-                <a href="#contact" class="block text-white hover:bg-gray-700 px-3 py-2 rounded-md">Contact</a>
-                <button onclick="toggleTheme()" class="theme-toggle">
-                    <span id="theme-icon" class="material-symbols-outlined">light_mode</span>
-                </button>
+        <div id="mobile-menu" class="md:hidden hidden">
+            <div class="backdrop-blur-md bg-card/80 border border-primary/20 rounded-2xl mx-4 mt-2 shadow-xl">
+                <div class="px-4 py-3 space-y-2">
+                    <a href="#home" class="block text-primary hover:text-secondary px-3 py-2 rounded-lg transition-all duration-200 font-medium">Home</a>
+                    <a href="#meme-generator" class="block text-primary hover:text-secondary px-3 py-2 rounded-lg transition-all duration-200 font-medium">Generator</a>
+                    <a href="#how-to" class="block text-primary hover:text-secondary px-3 py-2 rounded-lg transition-all duration-200 font-medium">How To</a>
+                    <a href="#blog" class="block text-primary hover:text-secondary px-3 py-2 rounded-lg transition-all duration-200 font-medium">Blog</a>
+                    <a href="#features" class="block text-primary hover:text-secondary px-3 py-2 rounded-lg transition-all duration-200 font-medium">Features</a>
+                </div>
             </div>
         </div>
     </nav>
@@ -48,12 +68,12 @@
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const htmlElement = document.documentElement;
-            const savedTheme = localStorage.getItem('theme') || 'dark';
+            const savedTheme = localStorage.getItem('theme') || 'light';
 
-            if (savedTheme === 'light') {
-                htmlElement.classList.add('light-mode');
+            if (savedTheme === 'dark') {
+                htmlElement.classList.add('dark-mode');
             } else {
-                htmlElement.classList.remove('light-mode');
+                htmlElement.classList.remove('dark-mode');
             }
 
             updateThemeIcon(savedTheme);
@@ -61,10 +81,10 @@
 
         function toggleTheme() {
             const htmlElement = document.documentElement;
-            const isLight = htmlElement.classList.contains('light-mode');
-            const newTheme = isLight ? 'dark' : 'light';
+            const isDark = htmlElement.classList.contains('dark-mode');
+            const newTheme = isDark ? 'light' : 'dark';
 
-            htmlElement.classList.toggle('light-mode', newTheme === 'light');
+            htmlElement.classList.toggle('dark-mode', newTheme === 'dark');
             localStorage.setItem('theme', newTheme);
             updateThemeIcon(newTheme);
         }

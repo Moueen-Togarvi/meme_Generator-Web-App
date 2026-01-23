@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 from django.conf import settings
+from django.core.cache import cache
 from .models import UserMeme
 import logging
 
@@ -16,22 +17,30 @@ logger = logging.getLogger(__name__)
 IMGFLIP_API_URL = 'https://api.imgflip.com/get_memes'
 
 def fetch_trending_memes():
+    # Check cache first
+    cached_memes = cache.get('trending_memes')
+    if cached_memes:
+        return cached_memes
+    
     try:
-        # Fetch memes from Imgflip API
-        response = requests.get(IMGFLIP_API_URL)
+        # Fetch memes from Imgflip API with timeout
+        response = requests.get(IMGFLIP_API_URL, timeout=5)
         if response.status_code == 200:
             data = response.json()
             if data['success']:
                 # Extract meme templates from the API response
                 memes = data['data']['memes']
-                return [{'id': meme['id'], 'url': meme['url'], 'name': meme['name']} for meme in memes[:10]]  # Limit to 10 memes
+                trending_memes = [{'id': meme['id'], 'url': meme['url'], 'name': meme['name']} for meme in memes[:8]]  # Reduced to 8 memes
+                # Cache for 1 hour
+                cache.set('trending_memes', trending_memes, 3600)
+                return trending_memes
         return []
     except requests.RequestException as e:
         logger.error(f"Error fetching memes from Imgflip API: {e}")
         return []
 
 def meme_editor(request):
-    # Fetch trending memes from Imgflip API
+    # Fetch trending memes from cache or API
     trending_memes = fetch_trending_memes()
     return render(request, 'meme_editor.html', {'templates': trending_memes})
 

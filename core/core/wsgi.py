@@ -15,14 +15,5 @@ os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'core.settings')
 
 application = get_wsgi_application()
 
-
-
-# {
-#   "version": 2,
-#   "builds": [
-#     { "src": "api/index.py", "use": "@vercel/python" }
-#   ],
-#   "routes": [
-#     { "src": "/(.*)", "dest": "api/index.py" }
-#   ]
-# }
+# Vercel requires 'app' as the WSGI callable
+app = application

@@ -1,9 +1,9 @@
 function toggleTheme() {
     const htmlElement = document.documentElement;
-    const isLight = htmlElement.classList.contains('light-mode');
-    const newTheme = isLight ? 'dark' : 'light';
+    const isDark = htmlElement.classList.contains('dark-mode');
+    const newTheme = isDark ? 'light' : 'dark';
 
-    htmlElement.classList.toggle('light-mode', newTheme === 'light');
+    htmlElement.classList.toggle('dark-mode', newTheme === 'dark');
     localStorage.setItem('theme', newTheme);
     updateThemeIcon(newTheme);
 }
@@ -44,21 +44,27 @@ let defaultTemplates = [
 document.addEventListener('DOMContentLoaded', () => {
     initCanvas();
     fetchMeme();
-
-    document.addEventListener('DOMContentLoaded', function () {
-        const htmlElement = document.documentElement;
-        const savedTheme = localStorage.getItem('theme') || 'dark';
+    initTheme();
     
-        if (savedTheme === 'light') {
-            htmlElement.classList.add('light-mode');
+    // Initialize live preview after canvas is ready
+    setTimeout(() => {
+        initLivePreview();
+    }, 2000);
+});
+
+// Initialize theme
+function initTheme() {
+        const htmlElement = document.documentElement;
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    
+    if (savedTheme === 'dark') {
+        htmlElement.classList.add('dark-mode');
         } else {
-            htmlElement.classList.remove('light-mode');
+        htmlElement.classList.remove('dark-mode');
         }
     
         updateThemeIcon(savedTheme);
-    });
-
-});
+}
 
 function initCanvas() {
     const canvasEl = document.getElementById('meme-canvas');
@@ -127,7 +133,15 @@ function loadRandomTemplate() {
 
 async function fetchMeme() {
     try {
-      const response = await fetch('https://api.imgflip.com/get_memes');
+      // Check if templates are already loaded
+      if (templates.length > 0) {
+        renderTemplates(templates.slice(0, 4));
+        return;
+      }
+
+      const response = await fetch('https://api.imgflip.com/get_memes', {
+        timeout: 5000
+      });
       
       if (!response.ok) {
         throw new Error(`API request failed with status ${response.status}`);
@@ -234,14 +248,193 @@ async function addTextToMeme() {
         // Reset the form (clears all inputs)
         if (textAdded) {
             form.reset();
-            document.getElementById('text-color').value = '#ffffff';
+            document.getElementById('text-color').value = '#000000';
             document.getElementById('text-size').value = '30';
+            // Clear live preview when adding permanent text
+            clearLivePreview();
         } else {
             alert('Please enter some text in either field');
         }
     } catch (error) {
         console.error('Error in addTextToMeme:', error);
         showErrorToUser(error.message || 'Failed to add text');
+    }
+}
+  
+// Live Preview System
+let livePreviewEnabled = true;
+let previewTexts = {
+    top: null,
+    bottom: null
+};
+
+function initLivePreview() {
+    console.log('Initializing live preview...');
+    
+    // Check if canvas is ready
+    if (!canvas) {
+        console.log('Canvas not ready, retrying...');
+        setTimeout(initLivePreview, 1000);
+        return;
+    }
+    
+    console.log('Canvas is ready, setting up live preview...');
+    
+    // Add event listeners for live preview
+    const topTextInput = document.getElementById('top-text');
+    const bottomTextInput = document.getElementById('bottom-text');
+    const textColorInput = document.getElementById('text-color');
+    const textSizeInput = document.getElementById('text-size');
+
+    if (topTextInput) {
+        topTextInput.addEventListener('input', () => updateLivePreview('top'));
+        topTextInput.addEventListener('keyup', () => updateLivePreview('top'));
+    }
+
+    if (bottomTextInput) {
+        bottomTextInput.addEventListener('input', () => updateLivePreview('bottom'));
+        bottomTextInput.addEventListener('keyup', () => updateLivePreview('bottom'));
+    }
+
+    if (textColorInput) {
+        textColorInput.addEventListener('input', () => updateLivePreviewColor());
+        textColorInput.addEventListener('change', () => updateLivePreviewColor());
+    }
+
+    if (textSizeInput) {
+        textSizeInput.addEventListener('input', () => updateLivePreviewSize());
+        textSizeInput.addEventListener('change', () => updateLivePreviewSize());
+    }
+    
+    console.log('Live preview initialized successfully');
+}
+
+// Test function for live preview
+function testLivePreview() {
+    console.log('Testing live preview...');
+    console.log('Canvas available:', !!canvas);
+    console.log('Live preview enabled:', livePreviewEnabled);
+    
+    // Add some test text
+    document.getElementById('top-text').value = 'Test Top Text';
+    document.getElementById('bottom-text').value = 'Test Bottom Text';
+    
+    // Trigger live preview
+    updateLivePreview('top');
+    updateLivePreview('bottom');
+}
+
+function updateLivePreview(type) {
+    if (!livePreviewEnabled || !canvas) return;
+
+    const textInput = document.getElementById(`${type}-text`);
+    const textColor = document.getElementById('text-color').value;
+    const textSize = parseInt(document.getElementById('text-size').value);
+
+    if (!textInput || !textInput.value.trim()) {
+        // Remove existing preview text if input is empty
+        if (previewTexts[type]) {
+            canvas.remove(previewTexts[type]);
+            previewTexts[type] = null;
+        }
+        return;
+    }
+
+    // Remove existing preview text
+    if (previewTexts[type]) {
+        canvas.remove(previewTexts[type]);
+    }
+
+    // Create new preview text
+    const textObj = new fabric.Text(textInput.value.trim(), {
+        left: canvas.width / 2,
+        top: type === 'top' ? textSize * 0.5 : canvas.height - textSize * 1.5,
+        fill: textColor,
+        fontSize: textSize,
+        fontFamily: 'Impact, sans-serif',
+        fontWeight: 'bold',
+        originX: 'center',
+        originY: type === 'top' ? 'top' : 'bottom',
+        textAlign: 'center',
+        editable: false,
+        padding: 5,
+        shadow: 'rgba(0,0,0,0.5) 2px 2px 2px',
+        name: `preview-${type}`,
+        opacity: 0.8
+    });
+
+    canvas.add(textObj);
+    textObj.bringToFront();
+    previewTexts[type] = textObj;
+    canvas.renderAll();
+}
+
+function updateLivePreviewColor() {
+    if (!livePreviewEnabled || !canvas) return;
+
+    const textColor = document.getElementById('text-color').value;
+    
+    // Update existing preview texts
+    Object.keys(previewTexts).forEach(type => {
+        if (previewTexts[type]) {
+            previewTexts[type].set('fill', textColor);
+        }
+    });
+    
+    canvas.renderAll();
+}
+
+function updateLivePreviewSize() {
+    if (!livePreviewEnabled || !canvas) return;
+
+    const textSize = parseInt(document.getElementById('text-size').value);
+    
+    // Update existing preview texts
+    Object.keys(previewTexts).forEach(type => {
+        if (previewTexts[type]) {
+            previewTexts[type].set('fontSize', textSize);
+            // Update position based on type
+            if (type === 'top') {
+                previewTexts[type].set('top', textSize * 0.5);
+            } else {
+                previewTexts[type].set('top', canvas.height - textSize * 1.5);
+            }
+        }
+    });
+    
+    canvas.renderAll();
+}
+
+function clearLivePreview() {
+    Object.keys(previewTexts).forEach(type => {
+        if (previewTexts[type]) {
+            canvas.remove(previewTexts[type]);
+            previewTexts[type] = null;
+        }
+    });
+    canvas.renderAll();
+}
+
+function toggleLivePreview() {
+    livePreviewEnabled = !livePreviewEnabled;
+    const toggle = document.getElementById('live-preview-toggle');
+    
+    if (livePreviewEnabled) {
+        // Enable live preview
+        toggle.classList.remove('bg-gray-300');
+        toggle.classList.add('bg-indigo-600');
+        toggle.querySelector('span').classList.remove('translate-x-0');
+        toggle.querySelector('span').classList.add('translate-x-6');
+        // Update existing previews
+        updateLivePreview('top');
+        updateLivePreview('bottom');
+    } else {
+        // Disable live preview
+        toggle.classList.remove('bg-indigo-600');
+        toggle.classList.add('bg-gray-300');
+        toggle.querySelector('span').classList.remove('translate-x-6');
+        toggle.querySelector('span').classList.add('translate-x-0');
+        clearLivePreview();
     }
 }
   
@@ -529,17 +722,56 @@ function createErrorDisplay() {
 
 
 
-// emojis 
-
-const emojiData = {
-    "Smileys & Emotion": ["😀","😃","😄","😁","😆","😅","😂","🤣","🥲","🥹","😊","😇","🙂","🙃","😉","😌","😍","🥰","😘","😗","😙","😚","😋","😛","😝","😜","🤪","🤨","🧐","🤓","😎","🥸","🤩","🥳","😏","😒","😞","😔","😟","😕","🙁","☹️","😣","😖","😫","😩","🥺","😢","😭","😤","😠","😡","🤬","🤯","😳","🥵","🥶","😱","😨","😰","😥","😓","🫣","🤗","🫡","🤔","🫢","🤭","🤫","🤥","😶","😶‍🌫️","😐","😑","😬","🫠","🙄","😯","😦","😧","😮","😲","🥱","😴","🤤","😪","😵","😵‍💫","🫥","🤐","🥴","🤢","🤮","🤧","😷","🤒","🤕","🤑","🤠","😈","👿","👹","👺","🤡","👻","👽","👾","🤖","😺","😸","😹","😻","😼","😽","🙀","😿","😾"],
-    "People & Body": ["👋","🤚","🖐️","✋","🖖","👌","🤌","🤏","✌️","🤞","🫰","🤟","🤘","🤙","🫵","🫱","🫲","🫳","🫴","👈","👉","👆","🖕","👇","☝️","👍","👎","✊","👊","🤛","🤜","👏","🫶","🙌","👐","🤲","🤝","🙏","✍️","💅","🤳","💪","🦾","🦿","🦵","🦶","👂","🦻","👃","🧠","🫀","🫁","🦷","🦴","👀","👁️","👅","👄","🫦","👶","🧒","👦","👧","🧑","👱","👨","🧔","👨‍🦰","👨‍🦱","👨‍🦳","👨‍🦲","👩","👩‍🦰","👩‍🦱","👩‍🦳","👩‍🦲","🧓","👴","👵","🙍","🙍‍♂️","🙍‍♀️","🙎","🙎‍♂️","🙎‍♀️","🙅","🙅‍♂️","🙅‍♀️","🙆","🙆‍♂️","🙆‍♀️","💁","💁‍♂️","💁‍♀️","🙋","🙋‍♂️","🙋‍♀️","🧏","🧏‍♂️","🧏‍♀️","🙇","🙇‍♂️","🙇‍♀️","🤦","🤦‍♂️","🤦‍♀️","🤷","🤷‍♂️","🤷‍♀️","👮","👮‍♂️","👮‍♀️","🕵️","🕵️‍♂️","🕵️‍♀️","💂","💂‍♂️","💂‍♀️","🥷","👷","👷‍♂️","👷‍♀️","🫅","🤴","👸","👳","👳‍♂️","👳‍♀️","👲","🧕","🤵","🤵‍♂️","🤵‍♀️","👰","👰‍♂️","👰‍♀️","🫃","🫄","🤰","🤱","👩‍🍼","👨‍🍼","🧑‍🍼","👼","🎅","🤶","🧑‍🎄","🦸","🦸‍♂️","🦸‍♀️","🦹","🦹‍♂️","🦹‍♀️","🧙","🧙‍♂️","🧙‍♀️","🧚","🧚‍♂️","🧚‍♀️","🧛","🧛‍♂️","🧛‍♀️","🧜","🧜‍♂️","🧜‍♀️","🧝","🧝‍♂️","🧝‍♀️","🧞","🧞‍♂️","🧞‍♀️","🧟","🧟‍♂️","🧟‍♀️","🧌","💆","💆‍♂️","💆‍♀️","💇","💇‍♂️","💇‍♀️","🚶","🚶‍♂️","🚶‍♀️","🧍","🧍‍♂️","🧍‍♀️","🧎","🧎‍♂️","🧎‍♀️","🏃","🏃‍♂️","🏃‍♀️","💃","🕺","🕴️","👯","👯‍♂️","👯‍♀️","🧖","🧖‍♂️","🧖‍♀️","🧗","🧗‍♂️","🧗‍♀️","🤺","🏇","⛷️","🏂","🪂","🏌️","🏌️‍♂️","🏌️‍♀️","🏄","🏄‍♂️","🏄‍♀️","🚣","🚣‍♂️","🚣‍♀️","🏊","🏊‍♂️","🏊‍♀️","⛹️","⛹️‍♂️","⛹️‍♀️","🏋️","🏋️‍♂️","🏋️‍♀️","🚴","🚴‍♂️","🚴‍♀️","🚵","🚵‍♂️","🚵‍♀️","🤸","🤸‍♂️","🤸‍♀️","🤼","🤼‍♂️","🤼‍♀️","🤽","🤽‍♂️","🤽‍♀️","🤾","🤾‍♂️","🤾‍♀️","🤹","🤹‍♂️","🤹‍♀️","🧘","🧘‍♂️","🧘‍♀️","🛀","🛌","🧑‍🤝‍🧑","👭","👫","👬","💏","👩‍❤️‍💋‍👨","👨‍❤️‍💋‍👨","👩‍❤️‍💋‍👩","💑","👩‍❤️‍👨","👨‍❤️‍👨","👩‍❤️‍👩","👪","👨‍👩‍👦","👨‍👩‍👧","👨‍👩‍👧‍👦","👨‍👩‍👦‍👦","👨‍👩‍👧‍👧","👨‍👨‍👦","👨‍👨‍👧","👨‍👨‍👧‍👦","👨‍👨‍👦‍👦","👨‍👨‍👧‍👧","👩‍👩‍👦","👩‍👩‍👧","👩‍👩‍👧‍👦","👩‍👩‍👦‍👦","👩‍👩‍👧‍👧","👨‍👦","👨‍👦‍👦","👨‍👧","👨‍👧‍👦","👨‍👧‍👧","👩‍👦","👩‍👦‍👦","👩‍👧","👩‍👧‍👦","👩‍👧‍👧","🪢","🪮","🧶","🧵","🪡","🧥","🥼","🦺","👚","👕","👖","🩲","🩳","👔","👗","👙","🩱","👘","🥻","🩴","👠","👡","👢","👞","👟","🥾","🥿","🧦","🧤","🧣","🎩","🧢","👒","🎓","⛑️","🪖","👑","💍","👝","👛","👜","💼","🎒","🩴","👓","🕶️","🥽","🦯","🧳","🌂","🪄","💊","🩹","🩺","🧬","🦠","🧴","🧷","🪒","🧹","🧺","🧻","🪣","🧼","🪥","🧽","🧯","🛒","🛁","🪤","🪒","🔪","🏺"],
-    "Animals & Nature": ["🐶","🐱","🐭","🐹","🐰","🦊","🐻","🐼","🐻‍❄️","🐨","🐯","🦁","🐮","🐷","🐽","🐸","🐵","🙈","🙉","🙊","🐒","🐔","🐧","🐦","🐤","🐣","🐥","🦆","🦅","🦉","🦇","🐺","🐗","🐴","🦄","🐝","🪱","🐛","🦋","🐌","🐞","🐜","🪰","🪲","🪳","🦟","🦗","🕷️","🕸️","🦂","🐢","🐍","🦎","🦖","🦕","🐙","🦑","🦐","🦞","🦀","🐡","🐠","🐟","🐬","🐳","🐋","🦈","🐊","🐅","🐆","🦓","🦍","🦧","🦣","🐘","🦛","🦏","🐪","🐫","🦒","🦘","🦬","🐃","🐂","🐄","🐎","🐖","🐏","🐑","🦙","🐐","🦌","🐕","🐩","🦮","🐕‍🦺","🐈","🐈‍⬛","🪶","🐓","🦃","🦤","🦚","🦜","🦢","🦩","🕊️","🐇","🦝","🦨","🦡","🦫","🦦","🦥","🐁","🐀","🐿️","🦔","🌵","🎄","🌲","🌳","🌴","🪵","🌱","🌿","☘️","🍀","🎍","🪴","🎋","🍃","🍂","🍁","🍄","🐚","🪨","🌾","💐","🌷","🌹","🥀","🌺","🌸","🌼","🌻","🌞","🌝","🌛","🌜","🌚","🌕","🌖","🌗","🌘","🌑","🌒","🌓","🌔","🌙","🌎","🌍","🌏","🪐","💫","⭐","🌟","✨","⚡","☄️","💥","🔥","🌪️","🌈","☀️","🌤️","⛅","🌥️","☁️","🌦️","🌧️","⛈️","🌩️","🌨️","❄️","☃️","⛄","🌬️","💨","💧","💦","🫧","☔","☂️","🌊","🌫️"],
-    "Food & Drink": ["🍏","🍎","🍐","🍊","🍋","🍌","🍉","🍇","🍓","🫐","🍈","🍒","🍑","🥭","🍍","🥥","🥝","🍅","🍆","🥑","🥦","🥬","🥒","🌶️","🫑","🌽","🥕","🫒","🧄","🧅","🥔","🍠","🥐","🥯","🍞","🥖","🥨","🧀","🥚","🍳","🧈","🥞","🧇","🥓","🥩","🍗","🍖","🦴","🌭","🍔","🍟","🍕","🫓","🥪","🥙","🧆","🌮","🌯","🫔","🥗","🥘","🫕","🥫","🍝","🍜","🍲","🍛","🍣","🍱","🥟","🦪","🍤","🍙","🍚","🍘","🍥","🥠","🥮","🍢","🍡","🍧","🍨","🍦","🥧","🧁","🍰","🎂","🍮","🍭","🍬","🍫","🍿","🍩","🍪","🌰","🥜","🫘","🍯","🥛","🍼","🫖","☕","🍵","🧃","🥤","🧋","🍶","🍺","🍻","🥂","🍷","🫗","🍸","🍹","🍾","🧊","🥄","🍴","🍽️","🥣","🥡","🥢","🫙","🧂"],
-    "Travel & Places": ["🚗","🚕","🚙","🚌","🚎","🏎️","🚓","🚑","🚒","🚐","🛻","🚚","🚛","🚜","🦯","🦽","🦼","🛴","🚲","🛵","🏍️","🛺","🚨","🚔","🚍","🚘","🚖","🚡","🚠","🚟","🚃","🚋","🚞","🚝","🚄","🚅","🚈","🚂","🚆","🚇","🚊","🚉","✈️","🛫","🛬","🛩️","💺","🛰️","🚀","🛸","🚁","🛶","⛵","🚤","🛥️","🛳️","⛴️","🚢","⚓","🪝","⛽","🚧","🚦","🚥","🛑","🚏","🗺️","🗿","🗽","🗼","🏰","🏯","🏟️","🎡","🎢","🎠","⛲","⛱️","🏖️","🏝️","🏜️","🌋","⛰️","🏔️","🗻","🏕️","⛺","🛖","🏠","🏡","🏘️","🏚️","🏗️","🏭","🏢","🏬","🏣","🏤","🏥","🏦","🏨","🏪","🏫","🏩","💒","🏛️","⛪","🕌","🛕","🕍","🗾","🎑","🏞️","🌅","🌄","🌠","🎇","🎆","🌇","🌆","🏙️","🌃","🌌","🌉","🛣️","🛤️","🪨","🛢️","⛲","🎪","🎭","🖼️","🎨","🧵","🪡","🧶","🪢","👓","🕶️","🥽","🥼","🦺","👔","👕","👖","🧣","🧤","🧥","🧦","👗","👘","🥻","🩱","🩲","🩳","👙","👚","👛","👜","👝","🛍️","🎒","🩴","👞","👟","🥾","🥿","👠","👡","🩰","👢","👑","👒","🎩","🎓","🧢","🪖","⛑️","💄","💍","💼"],
-    "Activities": ["⚽","🏀","🏈","⚾","🥎","🎾","🏐","🏉","🥏","🎱","🪀","🏓","🏸","🏒","🏑","🥍","🏏","🪃","🥅","⛳","🪁","🏹","🎣","🤿","🥊","🥋","🎽","🛹","🛼","🛷","⛸️","🥌","🎯","🪀","🪂","🎱","🎮","🕹️","🎰","🎲","🧩","🪅","🪆","♟️","🀄","🎴","🎭","🖼️","🎨","🧵","🪡","🧶","🪢","🧵","🪡","🧶","🪢","🧵","🪡","🧶","🪢","🧵","🪡","🧶","🪢"],
-    "Objects": ["⌚","📱","📲","💻","⌨️","🖥️","🖨️","🖱️","🖲️","🕹️","🗜️","💽","💾","💿","📀","📼","📷","📸","📹","🎥","📽️","🎞️","📞","☎️","📟","📠","📺","📻","🎙️","🎚️","🎛️","🧭","⏱️","⏲️","⏰","🕰️","⌛","⏳","📡","🔋","🔌","💡","🔦","🕯️","🪔","🧯","🛢️","💸","💵","💴","💶","💷","💰","💳","🧾","✉️","📧","📨","📩","📤","📥","📦","📫","📪","📬","📭","📮","🗳️","✏️","✒️","🖋️","🖊️","🖌️","🖍️","📝","💼","📁","📂","🗂️","📅","📆","🗒️","🗓️","📇","📈","📉","📊","📋","📌","📍","📎","🖇️","📏","📐","✂️","🗃️","🗄️","🗑️","🔒","🔓","🔏","🔐","🔑","🗝️","🔨","🪓","⛏️","⚒️","🛠️","🗡️","⚔️","🔫","🪃","🏹","🛡️","🪚","🔧","🪛","🔩","⚙️","🗜️","⚖️","🦯","🔗","⛓️","🪝","🧰","🧲","🪜","⚗️","🧪","🧫","🧬","🔬","🔭","📡","💉","🩸","💊","🩹","🩺","🚪","🛏️","🛋️","🪑","🚽","🪠","🚿","🛁","🪤","🪒","🧴","🧷","🧹","🧺","🧻","🪣","🧼","🪥","🧽","🧯","🛒"],
-    "Symbols": ["❤️","🧡","💛","💚","💙","💜","🖤","🤍","🤎","💔","❣️","💕","💞","💓","💗","💖","💘","💝","💟","☮️","✝️","☪️","🕉️","☸️","✡️","🔯","🪯","🕎","☯️","☦️","🛐","⛎","♈","♉","♊","♋","♌","♍","♎","♏","♐","♑","♒","♓","🆔","⚛️","🉑","☢️","☣️","📴","📳","🈶","🈚","🈸","🈺","🈷️","✴️","🆚","💮","🉐","㊙️","㊗️","🈴","🈵","🈹","🈲","🅰️","🅱️","🆎","🆑","🅾️","🆘","❌","⭕","🛑","⛔","📛","🚫","💯","💢","♨️","🚷","🚯","🚳","🚱","🔞","📵","🚭","❗","❕","❓","❔","‼️","⁉️","🔅","🔆","〽️","⚠️","🚸","🔱","⚜️","🔰","♻️","✅","🈯","💹","❇️","✳️","❎","🌐","💠","Ⓜ️","🌀","💤","🏧","🚾","♿","🅿️","🈳","🈂️","🛂","🛃","🛄","🛅","🚹","🚺","🚼","🚻","🚮","🎦","📶","🈁","🔣","ℹ️","🔤","🔡","🔠","🆖","🆗","🆙","🆒","🆕","🆓","0️⃣","1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟","🔢","#️⃣","*️⃣","⏏️","▶️","⏸","⏯","⏹","⏺","⏭","⏮","⏩","⏪","⏫","⏬","◀️","🔼","🔽","➡️","⬅️","⬆️","⬇️","↗️","↘️","↙️","↖️","↕️","↔️","↪️","↩️","⤴️","⤵️","🔀","🔁","🔂","🔄","🔃","🎵","🎶","➕","➖","➗","✖️","♾","💲","💱","™️","©️","®️","〰️","➰","➿","🔚","🔙","🔛","🔝","🔜","✔️","☑️","🔘","🔴","🟠","🟡","🟢","🔵","🟣","⚫","⚪","🟤","🔺","🔻","🔸","🔹","🔶","🔷","🔳","🔲","▪️","▫️","◾","◽","◼️","◻️","🟥","🟧","🟨","🟩","🟦","🟪","🟫","⬛","⬜","🔈","🔇","🔉","🔊","🔔","🔕","📣","📢","💬","💭","🗯","♠️","♣️","♥️","♦️","🃏","🎴","🀄","🕐","🕑","🕒","🕓","🕔","🕕","🕖","🕗","🕘","🕙","🕚","🕛","🕜","🕝","🕞","🕟","🕠","🕡","🕢","🕣","🕤","🕥","🕦","🕧"]
+// Professional icon data using Material Symbols
+const iconData = {
+    "Popular": [
+        { name: "mood", text: "😊" },
+        { name: "sentiment_very_satisfied", text: "😄" },
+        { name: "mood_bad", text: "😞" },
+        { name: "sentiment_dissatisfied", text: "😒" },
+        { name: "mood_happy", text: "😀" },
+        { name: "sentiment_neutral", text: "😐" },
+        { name: "mood_sad", text: "😢" },
+        { name: "sentiment_very_dissatisfied", text: "😡" },
+        { name: "mood_angry", text: "😠" },
+        { name: "mood_surprised", text: "😮" }
+    ],
+    "Actions": [
+        { name: "thumb_up", text: "👍" },
+        { name: "thumb_down", text: "👎" },
+        { name: "favorite", text: "❤️" },
+        { name: "favorite_border", text: "🤍" },
+        { name: "star", text: "⭐" },
+        { name: "star_border", text: "☆" },
+        { name: "check_circle", text: "✅" },
+        { name: "cancel", text: "❌" },
+        { name: "add_circle", text: "➕" },
+        { name: "remove_circle", text: "➖" }
+    ],
+    "Objects": [
+        { name: "home", text: "🏠" },
+        { name: "work", text: "💼" },
+        { name: "school", text: "🎓" },
+        { name: "phone", text: "📱" },
+        { name: "computer", text: "💻" },
+        { name: "camera", text: "📷" },
+        { name: "music_note", text: "🎵" },
+        { name: "sports", text: "⚽" },
+        { name: "restaurant", text: "🍽️" },
+        { name: "local_cafe", text: "☕" }
+    ],
+    "Symbols": [
+        { name: "favorite", text: "❤️" },
+        { name: "star", text: "⭐" },
+        { name: "check_circle", text: "✅" },
+        { name: "cancel", text: "❌" },
+        { name: "warning", text: "⚠️" },
+        { name: "info", text: "ℹ️" },
+        { name: "lightbulb", text: "💡" },
+        { name: "flash_on", text: "⚡" },
+        { name: "fire", text: "🔥" },
+        { name: "water_drop", text: "💧" }
+    ]
   };
 
   // Sticker data - using OpenMoji (no API key needed)
@@ -619,7 +851,7 @@ const emojiData = {
     });
   }
   
-  function renderEmojis(category = 'Smileys') {
+  function renderEmojis(category = 'Popular') {
     const container = document.getElementById('picker-content');
     container.innerHTML = '';
     
