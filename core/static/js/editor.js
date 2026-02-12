@@ -90,8 +90,31 @@ function initCanvas() {
     // Handle window resizing
     window.addEventListener('resize', handleResize);
 
-    // Load a random default template
+    // Selection listeners for interactive editing
+    canvas.on('selection:created', onObjectSelected);
+    canvas.on('selection:updated', onObjectSelected);
+    canvas.on('selection:cleared', onSelectionCleared);
+
+    // Initial load
     loadRandomTemplate();
+}
+
+function onObjectSelected(options) {
+    const selectedObject = options.selected ? options.selected[0] : options.target;
+    if (selectedObject && (selectedObject.type === 'text' || selectedObject.type === 'i-text')) {
+        // Sync UI with selected object properties
+        const colorInput = document.getElementById('text-color');
+        const sizeInput = document.getElementById('text-size');
+        const sizeValue = document.getElementById('size-value');
+
+        if (colorInput) colorInput.value = selectedObject.fill;
+        if (sizeInput) sizeInput.value = selectedObject.fontSize;
+        if (sizeValue) sizeValue.textContent = selectedObject.fontSize + 'px';
+    }
+}
+
+function onSelectionCleared() {
+    // Optional: Reset UI to defaults if needed
 }
 
 function handleResize() {
@@ -413,6 +436,13 @@ function updateLivePreviewColor() {
         }
     });
 
+    // Apply to active object if it's text
+    const activeObject = canvas.getActiveObject();
+    if (activeObject && (activeObject.type === 'text' || activeObject.type === 'i-text')) {
+        activeObject.set('fill', textColor);
+        saveState();
+    }
+
     canvas.renderAll();
 }
 
@@ -433,6 +463,13 @@ function updateLivePreviewSize() {
             }
         }
     });
+
+    // Apply to active object if it's text
+    const activeObject = canvas.getActiveObject();
+    if (activeObject && (activeObject.type === 'text' || activeObject.type === 'i-text')) {
+        activeObject.set('fontSize', textSize);
+        saveState();
+    }
 
     canvas.renderAll();
 }
