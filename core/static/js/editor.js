@@ -53,6 +53,20 @@ document.addEventListener('DOMContentLoaded', () => {
     setTimeout(() => {
         initLivePreview();
     }, 2000);
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Delete' || e.key === 'Backspace') {
+            // Only delete if not currently typing in an input or IText element
+            const activeEl = document.activeElement;
+            const isInput = activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA';
+            const isEditingIText = canvas.getActiveObject() && canvas.getActiveObject().isEditing;
+
+            if (!isInput && !isEditingIText) {
+                removeText();
+            }
+        }
+    });
 });
 
 // Initialize theme
@@ -401,7 +415,7 @@ function updateLivePreview(type) {
     }
 
     // Create new preview text
-    const textObj = new fabric.Text(textInput.value.trim(), {
+    const textObj = new fabric.IText(textInput.value.trim(), {
         left: canvas.width / 2,
         top: type === 'top' ? textSize * 0.5 : canvas.height - textSize * 1.5,
         fill: textColor,
@@ -513,7 +527,7 @@ function toggleLivePreview() {
 
 
 function addTextElement(text, options) {
-    const textObj = new fabric.Text(text, {
+    const textObj = new fabric.IText(text, {
         left: canvas.width / 2,
         top: options.top,
         fill: options.fill,
@@ -541,7 +555,12 @@ function addTextElement(text, options) {
 function removeText() {
     const activeObject = canvas.getActiveObject();
     if (activeObject) {
+        // Don't allow deleting the background image if we want to be safe
+        if (activeObject.name === 'background-image') return;
+
         canvas.remove(activeObject);
+        canvas.discardActiveObject();
+        canvas.requestRenderAll();
         saveState();
     }
 }
@@ -1062,7 +1081,7 @@ function addToCanvas(content, isImage) {
         });
     } else {
         // For emojis
-        const text = new fabric.Text(content, {
+        const text = new fabric.IText(content, {
             left: canvas.width / 2,
             top: canvas.height / 2,
             fontSize: 40,
