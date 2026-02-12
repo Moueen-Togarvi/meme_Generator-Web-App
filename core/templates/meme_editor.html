@@ -54,143 +54,190 @@
     <hr class="type_10 border-gray-300" />
 
     <!-- Meme Generator Section -->
-    <section id="meme-generator" class="w-full py-20 bg-gray-50/50">
+    <section id="meme-generator" class="w-full py-8 bg-gray-50/50">
         <div class="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex flex-col lg:flex-row gap-8 items-start">
 
                 <!-- Left Sidebar: Templates -->
-                <div
-                    class="w-full lg:w-1/4 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden sticky top-24">
-                    <div class="p-6 border-b border-gray-50">
-                        <h3 class="text-lg font-bold text-gray-900 flex items-center space-x-2">
-                            <span class="material-symbols-outlined text-brand-primary">collections</span>
-                            <span>Templates</span>
-                        </h3>
-                    </div>
-                    <div class="p-4">
-                        <div class="relative mb-4">
-                            <input type="text" id="search-templates" placeholder="Search templates..."
-                                class="w-full pl-10 pr-4 py-2 bg-gray-50 border-none rounded-xl text-sm focus:ring-2 focus:ring-brand-primary/20 transition-all outline-none">
-                            <span
-                                class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">search</span>
-                        </div>
-                        <div id="meme-gallery"
-                            class="grid grid-cols-2 gap-2 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
-                            <!-- Templates injected by JS -->
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Center: Workspace (Canvas) -->
-                <div class="w-full lg:w-2/4 flex flex-col space-y-6">
-                    <div
-                        class="bg-white rounded-3xl shadow-sm border border-gray-100 p-8 flex flex-col items-center justify-center min-h-[600px] relative group">
+                <div <!-- Left Sidebar: Templates -->
+                    <div class="w-full lg:w-1/4 flex flex-col h-[600px] sticky top-24">
                         <div
-                            class="absolute top-4 right-4 flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="undoAction()"
-                                class="p-2 bg-white rounded-lg shadow-sm border border-gray-100 hover:text-brand-primary transition-colors"
-                                title="Undo">
-                                <span class="material-symbols-outlined">undo</span>
-                            </button>
-                            <button onclick="redoAction()"
-                                class="p-2 bg-white rounded-lg shadow-sm border border-gray-100 hover:text-brand-primary transition-colors"
-                                title="Redo">
-                                <span class="material-symbols-outlined">redo</span>
-                            </button>
-                        </div>
+                            class="bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col h-full overflow-hidden">
+                            <!-- Header & Search -->
+                            <div class="p-5 border-b border-gray-100 bg-white z-10">
+                                <h3
+                                    class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-4 flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-brand-primary text-lg">grid_view</span>
+                                    Templates
+                                </h3>
 
+                                <!-- Search -->
+                                <div class="relative group">
+                                    <input type="text" id="search-templates" placeholder="Search templates..."
+                                        class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all outline-none placeholder-gray-400">
+                                    <span
+                                        class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-primary transition-colors text-[20px]">search</span>
+                                </div>
+
+                                <!-- Tags Filter -->
+                                <div class="flex gap-2 mt-4 overflow-x-auto pb-1 no-scrollbar mask-gradient-right">
+                                    <button onclick="filterTemplates('all')"
+                                        class="px-3 py-1.5 bg-brand-primary text-white text-xs font-semibold rounded-full whitespace-nowrap shadow-md transition-transform hover:scale-105">
+                                        All
+                                    </button>
+                                    <button onclick="filterTemplates('Trending')"
+                                        class="px-3 py-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs font-semibold rounded-full whitespace-nowrap transition-colors">
+                                        Trending
+                                    </button>
+                                    <button onclick="filterTemplates('Classic')"
+                                        class="px-3 py-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs font-semibold rounded-full whitespace-nowrap transition-colors">
+                                        Classic
+                                    </button>
+                                    <button onclick="filterTemplates('New')"
+                                        class="px-3 py-1.5 bg-gray-100 text-gray-600 hover:bg-gray-200 text-xs font-semibold rounded-full whitespace-nowrap transition-colors">
+                                        New
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Gallery Grid -->
+                            <div class="flex-1 p-4 overflow-y-auto custom-scrollbar bg-gray-50/30">
+                                <div id="meme-gallery" class="grid grid-cols-2 gap-3 pb-4">
+                                    <!-- Templates injected by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Center: Workspace (Canvas) -->
+                    <div class="w-full lg:w-2/4 flex flex-col items-center">
                         <div
-                            class="relative w-full max-w-[500px] aspect-square bg-gray-50 rounded-2xl overflow-hidden flex items-center justify-center border-2 border-dashed border-gray-200">
-                            <canvas id="meme-canvas" width="500" height="500"
-                                class="max-w-full h-auto shadow-2xl rounded-lg"></canvas>
+                            class="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 flex flex-col items-center justify-center w-full relative">
+                            <!-- Canvas Container -->
+                            <div
+                                class="relative shadow-2xl rounded-sm overflow-hidden border-8 border-white bg-gray-100">
+                                <canvas id="meme-canvas" width="500" height="500"
+                                    class="max-w-full h-auto block"></canvas>
+                            </div>
+
+                            <!-- Canvas Controls overlay or below -->
+                            <div class="absolute top-6 right-6 flex gap-2">
+                                <button onclick="undoAction()"
+                                    class="p-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-sm border border-gray-200 hover:bg-white hover:text-brand-primary transition-all transform hover:scale-105 active:scale-95"
+                                    title="Undo">
+                                    <span class="material-symbols-outlined text-gray-700">undo</span>
+                                </button>
+                                <button onclick="redoAction()"
+                                    class="p-2 bg-white/90 backdrop-blur-sm rounded-lg shadow-sm border border-gray-200 hover:bg-white hover:text-brand-primary transition-all transform hover:scale-105 active:scale-95"
+                                    title="Redo">
+                                    <span class="material-symbols-outlined text-gray-700">redo</span>
+                                </button>
+                            </div>
                         </div>
 
-                        <div class="mt-8 w-full flex space-x-4">
-                            <input type="file" id="upload-image" accept="image/*" class="hidden" />
+                        <!-- Main Actions -->
+                        <div class="mt-6 flex w-full gap-4 max-w-[500px]">
                             <label for="upload-image"
-                                class="flex-1 px-6 py-4 bg-gray-900 text-white text-center font-bold rounded-2xl cursor-pointer hover:bg-gray-800 transition-all flex items-center justify-center space-x-2">
-                                <span class="material-symbols-outlined">cloud_upload</span>
-                                <span>Upload Image</span>
+                                class="flex-1 px-6 py-4 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-2xl cursor-pointer shadow-lg hover:shadow-xl transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2 group">
+                                <span
+                                    class="material-symbols-outlined group-hover:rotate-12 transition-transform">cloud_upload</span>
+                                <span>Upload</span>
+                                <input type="file" id="upload-image" accept="image/*" class="hidden" />
                             </label>
+
                             <button onclick="downloadMeme()"
-                                class="px-10 py-4 bg-brand-gradient text-white font-bold rounded-2xl shadow-lg hover:scale-105 transition-all flex items-center space-x-2">
-                                <span class="material-symbols-outlined">download</span>
-                                <span>Export</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Sidebar: Controls -->
-                <div class="w-full lg:w-1/4 space-y-6 sticky top-24">
-                    <!-- Text Controls -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-6">Text Content</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="text-xs font-bold text-gray-500 mb-2 block uppercase">Top Caption</label>
-                                <input type="text" id="top-text" placeholder="Something funny..."
-                                    class="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-brand-primary/20 transition-all outline-none">
-                            </div>
-                            <div>
-                                <label class="text-xs font-bold text-gray-500 mb-2 block uppercase">Bottom
-                                    Caption</label>
-                                <input type="text" id="bottom-text" placeholder="Even funnier..."
-                                    class="w-full px-4 py-3 bg-gray-50 border-none rounded-xl focus:ring-2 focus:ring-brand-primary/20 transition-all outline-none">
-                            </div>
-                            <button onclick="addTextToMeme()"
-                                class="w-full py-3 bg-brand-primary/10 text-brand-primary font-bold rounded-xl hover:bg-brand-primary hover:text-white transition-all">
-                                Add Custom Text
+                                class="flex-[1.5] px-6 py-4 bg-brand-gradient text-white font-bold rounded-2xl shadow-lg hover:shadow-brand-primary/40 transition-all transform hover:-translate-y-1 active:translate-y-0 flex items-center justify-center gap-2 group">
+                                <span class="material-symbols-outlined group-hover:animate-bounce">download</span>
+                                <span>Export Meme</span>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Styling Controls -->
-                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-                        <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-6">Styling</h3>
-                        <div class="space-y-6">
-                            <div>
-                                <div class="flex justify-between mb-2">
-                                    <label class="text-xs font-bold text-gray-500 uppercase">Size</label>
-                                    <span id="size-value"
-                                        class="text-xs font-bold text-brand-primary font-mono">40px</span>
-                                </div>
-                                <input type="range" id="text-size" min="20" max="100" value="40"
-                                    class="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-brand-primary">
+                    <!-- Right Sidebar: Controls -->
+                    <div class="w-full lg:w-1/4 flex flex-col gap-5 sticky top-24 h-fit">
+                        <!-- Text Controls -->
+                        <div class="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+                            <div class="p-5 border-b border-gray-50 bg-gray-50/50">
+                                <h3
+                                    class="text-sm font-bold text-gray-900 uppercase tracking-wider flex items-center gap-2">
+                                    <span class="material-symbols-outlined text-brand-secondary">text_fields</span>
+                                    Captions
+                                </h3>
                             </div>
+                            <div class="p-5 space-y-4">
+                                <div class="space-y-1">
+                                    <label class="text-[11px] font-bold text-gray-400 uppercase tracking-wide ml-1">Top
+                                        Text</label>
+                                    <input type="text" id="top-text" placeholder="Type something..."
+                                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all outline-none font-medium">
+                                </div>
+                                <div class="space-y-1">
+                                    <label
+                                        class="text-[11px] font-bold text-gray-400 uppercase tracking-wide ml-1">Bottom
+                                        Text</label>
+                                    <input type="text" id="bottom-text" placeholder="Type something..."
+                                        class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-all outline-none font-medium">
+                                </div>
 
-                            <div>
-                                <label class="text-xs font-bold text-gray-500 mb-2 block uppercase">Color</label>
-                                <div class="flex items-center space-x-3">
-                                    <div
-                                        class="relative w-10 h-10 rounded-full overflow-hidden border-2 border-gray-100 shadow-sm">
-                                        <input type="color" id="text-color" value="#ffffff"
-                                            class="absolute -inset-2 w-14 h-14 cursor-pointer">
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <button onclick="setTextColor('#ffffff')"
-                                            class="w-6 h-6 rounded-full bg-white border border-gray-200 hover:scale-110 transition-transform"
-                                            title="White"></button>
-                                        <button onclick="setTextColor('#000000')"
-                                            class="w-6 h-6 rounded-full bg-black border border-gray-900 hover:scale-110 transition-transform"
-                                            title="Black"></button>
-                                        <button onclick="setTextColor('#ff0000')"
-                                            class="w-6 h-6 rounded-full bg-red-500 hover:scale-110 transition-transform"
-                                            title="Red"></button>
-                                    </div>
+                                <div class="grid grid-cols-2 gap-3 pt-2">
+                                    <button onclick="addTextToMeme()"
+                                        class="col-span-1 py-3 bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 text-sm">
+                                        <span class="material-symbols-outlined text-[18px]">add</span> Add
+                                    </button>
+                                    <button onclick="deleteSelectedObject()"
+                                        class="col-span-1 py-3 bg-rose-50 text-rose-500 hover:bg-rose-100 font-bold rounded-xl transition-all flex items-center justify-center gap-1.5 text-sm border border-transparent hover:border-rose-200">
+                                        <span class="material-symbols-outlined text-[18px]">delete</span> Delete
+                                    </button>
                                 </div>
                             </div>
+                        </div>
 
-                            <button onclick="openPicker('emoji')"
-                                class="w-full py-4 bg-accent-mint/10 text-accent-mint font-bold rounded-xl hover:bg-accent-mint hover:text-white transition-all flex items-center justify-center space-x-2">
-                                <span class="material-symbols-outlined">add_reaction</span>
-                                <span>Add Emoji</span>
-                            </button>
+                        <!-- Styling Controls -->
+                        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                            <h3 class="text-xs font-black text-gray-400 uppercase tracking-widest mb-6">Styling</h3>
+                            <div class="space-y-6">
+                                <div>
+                                    <div class="flex justify-between mb-2">
+                                        <label class="text-xs font-bold text-gray-500 uppercase">Size</label>
+                                        <span id="size-value"
+                                            class="text-xs font-bold text-brand-primary font-mono">40px</span>
+                                    </div>
+                                    <input type="range" id="text-size" min="20" max="100" value="40"
+                                        class="w-full h-1.5 bg-gray-100 rounded-lg appearance-none cursor-pointer accent-brand-primary">
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-bold text-gray-500 mb-2 block uppercase">Color</label>
+                                    <div class="flex items-center space-x-3">
+                                        <div
+                                            class="relative w-10 h-10 rounded-full overflow-hidden border-2 border-gray-100 shadow-sm">
+                                            <input type="color" id="text-color" value="#ffffff"
+                                                class="absolute -inset-2 w-14 h-14 cursor-pointer">
+                                        </div>
+                                        <div class="flex gap-2">
+                                            <button onclick="setTextColor('#ffffff')"
+                                                class="w-6 h-6 rounded-full bg-white border border-gray-200 hover:scale-110 transition-transform"
+                                                title="White"></button>
+                                            <button onclick="setTextColor('#000000')"
+                                                class="w-6 h-6 rounded-full bg-black border border-gray-900 hover:scale-110 transition-transform"
+                                                title="Black"></button>
+                                            <button onclick="setTextColor('#ff0000')"
+                                                class="w-6 h-6 rounded-full bg-red-500 hover:scale-110 transition-transform"
+                                                title="Red"></button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <button onclick="openPicker('emoji')"
+                                    class="w-full py-4 bg-accent-mint/10 text-accent-mint font-bold rounded-xl hover:bg-accent-mint hover:text-white transition-all flex items-center justify-center space-x-2">
+                                    <span class="material-symbols-outlined">add_reaction</span>
+                                    <span>Add Emoji</span>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
     </section>
 
     <!-- Trending Section -->
@@ -322,133 +369,165 @@
             <!-- Step 2 -->
             <div
                 class="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl">
-                <!-- Footer Section -->
-                <footer class="bg-gray-900 pt-24 pb-12 overflow-hidden relative">
-                    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-                        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
-                            <!-- Brand -->
-                            <div class="col-span-1 md:col-span-1 space-y-6">
-                                <div class="flex items-center space-x-2">
-                                    <span
-                                        class="material-symbols-outlined text-brand-primary text-3xl">local_fire_department</span>
-                                    <span
-                                        class="text-2xl font-black text-white tracking-tighter uppercase">MemeMaster</span>
-                                </div>
-                                <p class="text-gray-400 leading-relaxed">
-                                    The ultimate playground for meme creators. Simple, fast, and 100% free.
-                                </p>
-                                <div class="flex space-x-4">
-                                    <a href="#"
-                                        class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:bg-brand-primary hover:text-white transition-all">
-                                        <i class="fab fa-twitter"></i>
-                                    </a>
-                                    <a href="#"
-                                        class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:bg-brand-primary hover:text-white transition-all">
-                                        <i class="fab fa-instagram"></i>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <!-- Product -->
-                            <div class="space-y-6">
-                                <h4 class="text-white font-bold uppercase tracking-widest text-sm">Product</h4>
-                                <ul class="space-y-4">
-                                    <li><a href="#meme-generator"
-                                            class="text-gray-400 hover:text-white transition-all">Create Meme</a></li>
-                                    <li><a href="#templates"
-                                            class="text-gray-400 hover:text-white transition-all">Templates</a></li>
-                                    <li><a href="#trending"
-                                            class="text-gray-400 hover:text-white transition-all">Trending</a></li>
-                                </ul>
-                            </div>
-
-                            <!-- Support -->
-                            <div class="space-y-6">
-                                <h4 class="text-white font-bold uppercase tracking-widest text-sm">Support</h4>
-                                <ul class="space-y-4">
-                                    <li><a href="#" class="text-gray-400 hover:text-white transition-all">Updates</a>
-                                    </li>
-                                    <li><a href="#" class="text-gray-400 hover:text-white transition-all">Community</a>
-                                    </li>
-                                    <li><a href="#" class="text-gray-400 hover:text-white transition-all">Contact</a>
-                                    </li>
-                                </ul>
-                            </div>
-
-                            <!-- Legal -->
-                            <div class="space-y-6">
-                                <h4 class="text-white font-bold uppercase tracking-widest text-sm">Legal</h4>
-                                <ul class="space-y-4">
-                                    <li><a href="#" class="text-gray-400 hover:text-white transition-all">Terms</a></li>
-                                    <li><a href="#" class="text-gray-400 hover:text-white transition-all">Privacy</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-
-                        <!-- Bottom Line -->
-                        <div
-                            class="pt-12 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
-                            <p class="text-gray-500 text-sm italic">
-                                Made for the culture.
-                            </p>
-                            <div class="flex items-center space-x-6">
-                                <p class="text-gray-500 text-sm">© 2025 MemeMaster. All rights reserved.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Decorative Glow -->
-                    <div
-                        class="absolute -bottom-24 -left-24 w-96 h-96 bg-brand-primary/10 blur-[120px] rounded-full pointer-events-none">
-                    </div>
-                </footer>
-
-                <!-- Picker Modal (Emoji/Symbols) -->
-                <div id="picker-modal"
-                    class="fixed inset-0 bg-black/60 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
-                    <div
-                        class="bg-white rounded-3xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl overflow-hidden scale-90 animate-zoom-in">
-                        <div class="flex justify-between items-center p-6 border-b border-gray-50">
-                            <h3 id="picker-title" class="font-bold text-xl text-gray-900">Select Emoji</h3>
-                            <button onclick="closePicker()"
-                                class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-900 transition-colors">
-                                <span class="material-symbols-outlined">close</span>
-                            </button>
-                        </div>
-                        <div class="p-6">
-                            <div class="relative mb-6">
-                                <input type="text" id="picker-search" placeholder="Search emojis..."
-                                    class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-primary/20 transition-all outline-none">
-                            </div>
-                            <div id="picker-categories"
-                                class="flex flex-wrap gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
-                            <div id="picker-content"
-                                class="grid grid-cols-5 gap-4 overflow-y-auto max-h-[40vh] pr-2 custom-scrollbar place-items-center">
-                            </div>
-                        </div>
-                    </div>
+                <div
+                    class="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-600 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <span class="text-white text-2xl font-bold">2</span>
                 </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3 text-center">Add Text</h3>
+                <p class="text-gray-600 text-center">Add top and bottom captions, or insert custom text boxes anywhere
+                    on the meme</p>
+            </div>
 
-                <script>
-                    // Styling helper functions
-                    function setTextColor(color) {
-                        document.getElementById('text-color').value = color;
-                        // Trigger any necessary updates if there's a listener for the input
-                        const event = new Event('input', { bubbles: true });
-                        document.getElementById('text-color').dispatchEvent(event);
-                    }
+            <!-- Step 3 -->
+            <div
+                class="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl">
+                <div
+                    class="w-16 h-16 bg-gradient-to-r from-pink-500 to-red-500 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <span class="text-white text-2xl font-bold">3</span>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3 text-center">Customize</h3>
+                <p class="text-gray-600 text-center">Style your text with colors, fonts, and sizes. Add emojis and
+                    stickers for extra flair</p>
+            </div>
 
-                    // Update size display value
-                    document.getElementById('text-size').addEventListener('input', function () {
-                        document.getElementById('size-value').textContent = this.value + 'px';
-                    });
+            <!-- Step 4 -->
+            <div
+                class="bg-white rounded-2xl p-6 shadow-xl border border-gray-100 transform hover:scale-105 transition-all duration-300 hover:shadow-2xl">
+                <div
+                    class="w-16 h-16 bg-gradient-to-r from-red-500 to-orange-500 rounded-full flex items-center justify-center mb-4 mx-auto">
+                    <span class="text-white text-2xl font-bold">4</span>
+                </div>
+                <h3 class="text-xl font-semibold text-gray-800 mb-3 text-center">Download</h3>
+                <p class="text-gray-600 text-center">Export your creation in high quality and share it instantly with
+                    your friends</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-                    // Simple search for templates (will be replaced by full logic in editor.js if needed)
-                    document.getElementById('search-templates').addEventListener('input', function (e) {
-                        const query = e.target.value.toLowerCase();
-                        // Filtering logic would happen here if templates were available in this scope
-                        console.log('Searching for:', query);
-                    });
-                </script>
-                {% endblock %}
+<!-- Footer Section -->
+<footer class="bg-gray-900 pt-24 pb-12 overflow-hidden relative">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+            <!-- Brand -->
+            <div class="col-span-1 md:col-span-1 space-y-6">
+                <div class="flex items-center space-x-2">
+                    <span class="material-symbols-outlined text-brand-primary text-3xl">local_fire_department</span>
+                    <span class="text-2xl font-black text-white tracking-tighter uppercase">MemeMaster</span>
+                </div>
+                <p class="text-gray-400 leading-relaxed">
+                    The ultimate playground for meme creators. Simple, fast, and 100% free.
+                </p>
+                <div class="flex space-x-4">
+                    <a href="#"
+                        class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:bg-brand-primary hover:text-white transition-all">
+                        <i class="fab fa-twitter"></i>
+                    </a>
+                    <a href="#"
+                        class="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center text-gray-400 hover:bg-brand-primary hover:text-white transition-all">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Product -->
+            <div class="space-y-6">
+                <h4 class="text-white font-bold uppercase tracking-widest text-sm">Product</h4>
+                <ul class="space-y-4">
+                    <li><a href="#meme-generator" class="text-gray-400 hover:text-white transition-all">Create Meme</a>
+                    </li>
+                    <li><a href="#templates" class="text-gray-400 hover:text-white transition-all">Templates</a></li>
+                    <li><a href="#trending" class="text-gray-400 hover:text-white transition-all">Trending</a></li>
+                </ul>
+            </div>
+
+            <!-- Support -->
+            <div class="space-y-6">
+                <h4 class="text-white font-bold uppercase tracking-widest text-sm">Support</h4>
+                <ul class="space-y-4">
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-all">Updates</a>
+                    </li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-all">Community</a>
+                    </li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-all">Contact</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Legal -->
+            <div class="space-y-6">
+                <h4 class="text-white font-bold uppercase tracking-widest text-sm">Legal</h4>
+                <ul class="space-y-4">
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-all">Terms</a></li>
+                    <li><a href="#" class="text-gray-400 hover:text-white transition-all">Privacy</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Bottom Line -->
+        <div
+            class="pt-12 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <p class="text-gray-500 text-sm italic">
+                Made for the culture.
+            </p>
+            <div class="flex items-center space-x-6">
+                <p class="text-gray-500 text-sm">© 2025 MemeMaster. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Decorative Glow -->
+    <div
+        class="absolute -bottom-24 -left-24 w-96 h-96 bg-brand-primary/10 blur-[120px] rounded-full pointer-events-none">
+    </div>
+</footer>
+
+<!-- Picker Modal (Emoji/Symbols) -->
+<div id="picker-modal"
+    class="fixed inset-0 bg-black/60 z-[100] hidden items-center justify-center p-4 backdrop-blur-sm">
+    <div
+        class="bg-white rounded-3xl w-full max-w-md max-h-[80vh] flex flex-col shadow-2xl overflow-hidden scale-90 animate-zoom-in">
+        <div class="flex justify-between items-center p-6 border-b border-gray-50">
+            <h3 id="picker-title" class="font-bold text-xl text-gray-900">Select Emoji</h3>
+            <button onclick="closePicker()"
+                class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-gray-900 transition-colors">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div class="p-6">
+            <div class="relative mb-6">
+                <input type="text" id="picker-search" placeholder="Search emojis..."
+                    class="w-full px-4 py-3 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-primary/20 transition-all outline-none">
+            </div>
+            <div id="picker-categories" class="flex flex-wrap gap-2 mb-6 overflow-x-auto pb-2 no-scrollbar"></div>
+            <div id="picker-content"
+                class="grid grid-cols-5 gap-4 overflow-y-auto max-h-[40vh] pr-2 custom-scrollbar place-items-center">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Styling helper functions
+    function setTextColor(color) {
+        const input = document.getElementById('text-color');
+        input.value = color;
+        // Trigger both input (for real-time) and change events
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+
+    // Update size display value
+    document.getElementById('text-size').addEventListener('input', function () {
+        document.getElementById('size-value').textContent = this.value + 'px';
+    });
+
+    // Simple search for templates (will be replaced by full logic in editor.js if needed)
+    document.getElementById('search-templates').addEventListener('input', function (e) {
+        const query = e.target.value.toLowerCase();
+        // Filtering logic would happen here if templates were available in this scope
+        console.log('Searching for:', query);
+    });
+</script>
+{% endblock %}
