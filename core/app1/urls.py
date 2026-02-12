@@ -11,6 +11,5 @@ urlpatterns = [
         'document_root': os.path.join(settings.BASE_DIR, 'static'),
     }),
     path('', views.meme_editor, name='meme_editor'),
-    path('fetch-memes/', views.fetch_trending_memes, name='fetch_memes'),
-    path('save-meme/', views.save_meme, name='save_meme'),
+    path('fetch-memes/', views.fetch_trending_memes_api, name='fetch_memes'),
 ]

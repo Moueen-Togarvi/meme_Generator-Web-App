@@ -49,6 +49,7 @@ if not SECRET_KEY:
     SECRET_KEY = "dev-only-unsafe-secret-key"
 
 # SECURITY WARNING: don't run with debug turned on in production!
+# Default to False for safety. Set DJANGO_DEBUG=True in .env for development.
 DEBUG = env_bool("DJANGO_DEBUG", default=False)
 
 ALLOWED_HOSTS = env_list(
@@ -58,6 +59,18 @@ ALLOWED_HOSTS = env_list(
 
 # Useful for platforms like Vercel; set if you see CSRF origin errors.
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", default=[])
+
+# Security Hardening (only applied if DEBUG is False)
+if not DEBUG:
+    SECURE_BROWSER_XSS_FILTER = True
+    SECURE_CONTENT_TYPE_NOSNIFF = True
+    X_FRAME_OPTIONS = 'DENY'
+    SECURE_SSL_REDIRECT = env_bool("SECURE_SSL_REDIRECT", default=True)
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000  # 1 year
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
 
 
 # Application definition
@@ -108,12 +121,10 @@ WSGI_APPLICATION = 'core.wsgi.application'
 
 
 DATABASES = {
-    'default': dj_database_url.config(
-        # For local dev you can omit DATABASE_URL and use sqlite.
-        default=os.environ.get('DATABASE_URL') or f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
-        conn_max_age=600,
-        ssl_require=env_bool("DATABASE_SSL_REQUIRE", default=False),
-    )
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    }
 }
 
 # Password validation
