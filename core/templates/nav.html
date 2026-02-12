@@ -1,103 +1,59 @@
-<nav
-    class="w-full sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between items-center h-20">
-            <!-- Brand Logo -->
-            <div class="flex items-center space-x-2">
-                <div
-                    class="w-10 h-10 bg-brand-gradient rounded-xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-0 transition-transform duration-300">
-                    <span class="material-symbols-outlined text-white text-2xl">local_fire_department</span>
-                </div>
-                <span class="text-2xl font-black tracking-tight text-gray-900">
-                    MemeMaster
-                </span>
+<nav class="fixed top-6 left-1/2 -translate-x-1/2 z-[100] w-auto animate-fade-in-down">
+    <div
+        class="bg-white/90 backdrop-blur-xl border border-gray-200 rounded-full px-4 py-2 shadow-2xl flex items-center gap-2 sm:gap-6">
+        <!-- Brand Logo (Simplified) -->
+        <a href="#home" class="flex items-center gap-2 pr-2 sm:pr-4 border-r border-gray-100 group">
+            <div
+                class="w-8 h-8 bg-brand-gradient rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                <span class="material-symbols-outlined text-white text-lg">local_fire_department</span>
             </div>
+            <span class="text-lg font-black tracking-tighter text-black hidden sm:block">MemeMaster</span>
+        </a>
 
-            <!-- Desktop Navigation -->
-            <div class="hidden md:flex items-center space-x-10">
-                <a href="#home"
-                    class="text-sm font-semibold text-gray-600 hover:text-brand-primary transition-colors">Home</a>
-                <a href="#meme-generator"
-                    class="text-sm font-semibold text-gray-600 hover:text-brand-primary transition-colors">Create
-                    Meme</a>
-                <a href="#trending"
-                    class="text-sm font-semibold text-gray-600 hover:text-brand-primary transition-colors">Trending</a>
-
-                <!-- Dark Mode Toggle -->
-                <button onclick="toggleTheme()"
-                    class="p-2.5 rounded-xl bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors border border-gray-100">
-                    <span id="theme-icon" class="material-symbols-outlined text-xl">dark_mode</span>
-                </button>
-
-                <!-- Auth/CTA -->
-                <button
-                    class="px-6 py-2.5 bg-brand-gradient text-white font-bold rounded-xl shadow-md hover:shadow-xl hover:scale-105 transition-all duration-300">
-                    Login
-                </button>
-            </div>
-
-            <!-- Mobile Menu Toggle -->
-            <div class="md:hidden flex items-center space-x-3">
-                <button onclick="toggleTheme()" class="p-2 rounded-lg bg-gray-50 text-gray-600">
-                    <span id="theme-icon-mobile" class="material-symbols-outlined">dark_mode</span>
-                </button>
-                <button id="mobile-menu-button" onclick="toggleMobileMenu()"
-                    class="p-2 rounded-lg text-gray-600 active:bg-gray-50">
-                    <span class="material-symbols-outlined text-3xl">menu</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Mobile Menu -->
-    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-100 animate-fade-in-up">
-        <div class="px-4 pt-2 pb-6 space-y-2">
+        <!-- Navigation Links -->
+        <div class="flex items-center gap-1 sm:gap-4">
             <a href="#home"
-                class="block px-4 py-3 text-base font-semibold text-gray-600 rounded-xl hover:bg-gray-50">Home</a>
+                class="flex items-center gap-1.5 px-3 py-2 rounded-full text-black hover:bg-gray-50 transition-all font-bold text-xs sm:text-sm group">
+                <span
+                    class="material-symbols-outlined text-gray-400 group-hover:text-brand-primary transition-colors text-lg sm:text-xl">home</span>
+                <span class="hidden xs:block">Home</span>
+            </a>
             <a href="#meme-generator"
-                class="block px-4 py-3 text-base font-semibold text-gray-600 rounded-xl hover:bg-gray-50">Create
-                Meme</a>
+                class="flex items-center gap-1.5 px-3 py-2 rounded-full text-black hover:bg-gray-50 transition-all font-bold text-xs sm:text-sm group">
+                <span
+                    class="material-symbols-outlined text-gray-400 group-hover:text-brand-primary transition-colors text-lg sm:text-xl">add_box</span>
+                <span class="hidden xs:block">Create</span>
+            </a>
             <a href="#trending"
-                class="block px-4 py-3 text-base font-semibold text-gray-600 rounded-xl hover:bg-gray-50">Trending</a>
-            <button class="w-full mt-4 px-6 py-4 bg-brand-gradient text-white font-bold rounded-xl">
-                Login
-            </button>
+                class="flex items-center gap-1.5 px-3 py-2 rounded-full text-black hover:bg-gray-50 transition-all font-bold text-xs sm:text-sm group">
+                <span
+                    class="material-symbols-outlined text-gray-400 group-hover:text-brand-primary transition-colors text-lg sm:text-xl">trending_up</span>
+                <span class="hidden xs:block">Trending</span>
+            </a>
         </div>
     </div>
 </nav>
 
-<script>
-    function toggleMobileMenu() {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('hidden');
-    }
+<style>
+    @keyframes fade-in-down {
+        from {
+            opacity: 0;
+            transform: translate(-50%, -20px);
+        }
 
-    function toggleTheme() {
-        const html = document.documentElement;
-        if (html.classList.contains('dark')) {
-            html.classList.remove('dark');
-            localStorage.setItem('theme', 'light');
-            updateIcons('light');
-        } else {
-            html.classList.add('dark');
-            localStorage.setItem('theme', 'dark');
-            updateIcons('dark');
+        to {
+            opacity: 1;
+            transform: translate(-50%, 0);
         }
     }
 
-    function updateIcons(theme) {
-        const icons = [document.getElementById('theme-icon'), document.getElementById('theme-icon-mobile')];
-        icons.forEach(icon => {
-            if (icon) icon.textContent = theme === 'dark' ? 'light_mode' : 'dark_mode';
-        });
+    .animate-fade-in-down {
+        animation: fade-in-down 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
     }
 
-    // Initialize theme
-    if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
-        updateIcons('dark');
-    } else {
-        document.documentElement.classList.remove('dark');
-        updateIcons('light');
+    @media (max-width: 480px) {
+        .xs\:block {
+            display: none;
+        }
     }
-</script>
+</style>

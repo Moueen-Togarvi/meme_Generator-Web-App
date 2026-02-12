@@ -6,6 +6,9 @@ from django.http import JsonResponse
 from django.core.files.base import ContentFile
 from django.conf import settings
 from django.core.cache import cache
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Imgflip API credentials (replace with your own)
 IMGFLIP_API_URL = 'https://api.imgflip.com/get_memes'
@@ -39,7 +42,10 @@ def fetch_trending_memes_api(request):
     return JsonResponse({'success': True, 'data': {'memes': memes}})
 
 def meme_editor(request):
-    # We can still pass initial templates for faster first paint if desired,
-    # but the JS will handle loading more.
+    # Pass templates as JSON for the JavaScript pagination
     trending_memes = fetch_trending_memes()
-    return render(request, 'meme_editor.html', {'templates': trending_memes})
+    context = {
+        'templates_json': json.dumps(trending_memes),
+        'templates': trending_memes,  # Keep for potential SSR needs
+    }
+    return render(request, 'meme_editor.html', context)

@@ -835,8 +835,8 @@ function createErrorDisplay() {
 
 
 
-// Professional icon data using Material Symbols
-const iconData = {
+// Professional emoji data using Material Symbols
+const emojiData = {
     "Popular": [
         { name: "mood", text: "😊" },
         { name: "sentiment_very_satisfied", text: "😄" },
@@ -970,10 +970,10 @@ function renderEmojis(category = 'Popular') {
 
     emojiData[category].forEach(emoji => {
         const btn = document.createElement('button');
-        btn.textContent = emoji;
+        btn.textContent = emoji.text;
         btn.className = 'text-2xl p-2 hover:bg-gray-100 rounded-lg';
         btn.onclick = () => {
-            addToCanvas(emoji, false);
+            addToCanvas(emoji.text, false);
             closePicker();
         };
         container.appendChild(btn);
@@ -1013,12 +1013,12 @@ function searchEmojis(query) {
     }
 
     Object.values(emojiData).flat().forEach(emoji => {
-        if (emoji.includes(query)) {
+        if (emoji.text.includes(query) || emoji.name.toLowerCase().includes(query.toLowerCase())) {
             const btn = document.createElement('button');
-            btn.textContent = emoji;
+            btn.textContent = emoji.text;
             btn.className = 'text-2xl p-2 hover:bg-gray-100 rounded-lg';
             btn.onclick = () => {
-                addToCanvas(emoji, false);
+                addToCanvas(emoji.text, false);
                 closePicker();
             };
             container.appendChild(btn);
