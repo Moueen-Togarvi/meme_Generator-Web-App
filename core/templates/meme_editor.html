@@ -1,7 +1,9 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<!-- Add this to the <head> section of your base.html or here if not already included -->
+<!-- Performance Optimizations -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 
 <!-- Hero Section (Mockup Inspired) -->
@@ -37,7 +39,8 @@
         <!-- Grand Headline -->
         <h1 class="text-64px md:text-[6rem] lg:text-[8rem] font-black tracking-tighter mb-8 leading-[0.8] animate-fade-in-up"
             style="animation-delay: 0.1s">
-            Make the World <br> <span class="gradient-text">Laugh</span>
+            Make the World <br> <span
+                class="gradient-text typewriter-laugh inline-block overflow-hidden whitespace-nowrap border-r-4 border-brand-primary">Laugh</span>
         </h1>
 
         <!-- Subheading -->
@@ -414,7 +417,8 @@
                     class="bg-white rounded-[2rem] border border-gray-200 overflow-hidden hover:shadow-2xl transition-all duration-500 group reveal-item">
                     <div class="h-56 overflow-hidden bg-gray-50">
                         <img src="{% static 'images/blog/blog_paradoxical_humor.png' %}" alt="Paradoxical Humor"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            loading="lazy">
                     </div>
                     <div class="p-8">
                         <span
@@ -435,7 +439,8 @@
                     class="bg-white rounded-[2rem] border border-gray-200 overflow-hidden hover:shadow-2xl transition-all duration-500 group reveal-item">
                     <div class="h-56 overflow-hidden bg-gray-50">
                         <img src="{% static 'images/blog/blog_viral_psychology.png' %}" alt="Viral Psychology"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            loading="lazy">
                     </div>
                     <div class="p-8">
                         <span
@@ -455,7 +460,8 @@
                     class="bg-white rounded-[2rem] border border-gray-200 overflow-hidden hover:shadow-2xl transition-all duration-500 group reveal-item">
                     <div class="h-56 overflow-hidden bg-gray-50">
                         <img src="{% static 'images/blog/blog_sarcastic_anatomy.png' %}" alt="Sarcastic Anatomy"
-                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+                            class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                            loading="lazy">
                     </div>
                     <div class="p-8">
                         <span
@@ -748,6 +754,7 @@
             opacity: 0;
             transform: translateY(30px);
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
         }
 
         .reveal.active {
@@ -759,6 +766,7 @@
             opacity: 0;
             transform: translateY(30px);
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
         }
 
         .reveal-item.active {
@@ -814,6 +822,7 @@
 
         .animate-float-slow {
             animation: float-slow 6s ease-in-out infinite;
+            will-change: transform;
         }
 
         @keyframes pulse-slow {
@@ -832,6 +841,7 @@
 
         .animate-pulse-slow {
             animation: pulse-slow 8s ease-in-out infinite;
+            will-change: transform, opacity;
         }
 
         @keyframes blob {
@@ -852,6 +862,36 @@
 
         .animate-blob {
             animation: blob 20s infinite alternate;
+            will-change: transform;
+        }
+
+        @keyframes typewriter {
+            from {
+                width: 0;
+            }
+
+            to {
+                width: 100%;
+            }
+        }
+
+        @keyframes blink-caret {
+
+            from,
+            to {
+                border-color: transparent
+            }
+
+            50% {
+                border-color: #6366f1;
+            }
+        }
+
+        .typewriter-laugh {
+            animation:
+                typewriter 2s steps(5, end) infinite alternate,
+                blink-caret 0.75s step-end infinite;
+            max-width: fit-content;
         }
 
         /* Mockup Specific Styles */
